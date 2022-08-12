@@ -1,25 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-
-import {styled} from '@mui/material/styles';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
 
-import {createSubscriptions} from "./lib/subscriptions";
+import { styled } from '@mui/material/styles';
+import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import InputBase from '@mui/material/InputBase';
+
+import { createSubscriptions } from "./lib/subscriptions";
 import "./style.css";
 
 const theme = {
 
   textColor: "#ffffff",
-  backgruondColor: "#2e2e2e",
-  menubarColor: "#181818",
+  backgruondColor: "#010409",
+  headerColor: "#0d1117",
+  menuColor: "#161b22"
 }
 
 function Logo() {
 
   const Image = styled('img')({
 
-    width: '80px',
+    width: '70px',
     marginRight: "15px",
 
     "@media (min-width: 600px)": {
@@ -28,7 +32,7 @@ function Logo() {
 
   });
 
-  return (<Image src="assets/ipcv0.svg" />);
+  return (<Image src="assets/ipcv0-small.svg" />);
 }
 
 function IOLogo() {
@@ -46,6 +50,33 @@ function IOLogo() {
   });
 
   return (<Image src="assets/ipcv0-io.svg" />);
+}
+
+function OpenSeaIcon() {
+
+  const Image = styled('img')({
+    marginRight: "24px",
+    width: "32px"
+  });
+
+  return (
+    <Link href="https://opensea.io/collection/immortalplayercharacters-v0-wrapped">
+      <Image src="assets/opensea.svg" />
+    </Link>
+  );
+}
+
+function DiscordIcon() {
+
+  const Image = styled('img')({
+    width: "32px"
+  });
+
+  return (
+    <Link href="https://discord.com/invite/tppsuZp7v3">
+      <Image src="assets/discord.svg" />
+    </Link>
+  );
 }
 
 function Container(props) {
@@ -69,10 +100,10 @@ function Container(props) {
   return (<_Container>{props.children}</_Container>);
 }
 
-function Menubar(props) {
+function Header(props) {
 
-  const _Menubar = styled(Box)({
-    backgroundColor: theme.menubarColor
+  const _Header = styled(Box)({
+    backgroundColor: theme.headerColor
   });
 
   const InnerContainer = styled(Box)({
@@ -85,42 +116,72 @@ function Menubar(props) {
     padding: "24px 32px",
   });
 
-  const LogoWrapper = styled(Box)({
+  const LogoSpan = styled(Box)({
 
     display: "flex",
     flexDirection: "row",
+  });
+
+  const SocialSpan = styled(Box)({
+
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end"
+  });
+
+  const SearchStack = styled(Box)({
+
+    flex: 2,
+    display: "flex",
+    flexDirection: "column",
+  });
+
+  const MenuSpan = styled(Box)({
+    backgroundColor: theme.menuColor
   });
 
   const Menu = styled(Box)({
 
-    flex: 2,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "flex-end",
-    padding: "8px",
+    justifyContent: "center",
+    padding: "12px",
     fontSize: "16px"
   });
 
   const MenuItem = styled(Box)({
-    padding: "0 16px"
+
+    cursor: "pointer",
+    padding: "0 16px",
+    textAlign: "center",
   });
 
   return (
-    <_Menubar>
+    <_Header>
       <Container>
         <InnerContainer>
-	  <LogoWrapper>
+	  <LogoSpan>
             <Logo />
             <IOLogo />
-	  </LogoWrapper>
-	  <Menu>
-	    <MenuItem>About</MenuItem>
-	    <MenuItem>Explore</MenuItem>
-	    <MenuItem>Connect Wallet</MenuItem>
-	  </Menu>
+	  </LogoSpan>
+	  <SearchStack>
+	    <SocialSpan>
+              <OpenSeaIcon />
+              <DiscordIcon />
+	    </SocialSpan>
+	  </SearchStack>
 	</InnerContainer>
       </Container>
-    </_Menubar>
+      <MenuSpan>
+        <Container>
+	  <Menu>
+	    <MenuItem>About</MenuItem>
+	    <MenuItem>Wrap/Unwrap IPC</MenuItem>
+	    <MenuItem>Connect Wallet</MenuItem>
+          </Menu>
+	</Container>
+      </MenuSpan>
+    </_Header>
   );
 }
 
@@ -130,13 +191,14 @@ function Layout(props) {
 
     height: "100vh", 
     backgroundColor: theme.backgruondColor,
+    fontFamily: 'poppins-light',
     color: theme.textColor
   });
 
   return (
     <_Layout>
-      <Menubar />
-      {props.children}
+      <Header />
+      { props.children }
     </_Layout>
   );
 }
@@ -146,6 +208,10 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <CssBaseline />
-    <Layout/>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={ <Layout /> } />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );

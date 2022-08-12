@@ -1,3 +1,63 @@
+@font-face {
+
+  font-family: 'poppins';
+  src: url('./Poppins/Poppins-Medium.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins';
+  font-style: italic;
+  src: url('./Poppins/Poppins-Medium.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins';
+  font-weight: bold;
+  src: url('./Poppins/Poppins-Bold.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins-semibold';
+  src: url('./Poppins/Poppins-SemiBold.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins-semibold';
+  font-style: italic;
+  src: url('./Poppins/Poppins-SemiBoldItalic.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins-extrabold';
+  src: url('./Poppins/Poppins-ExtraBold.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins-extrabold';
+  font-style: italic;
+  src: url('./Poppins/Poppins-ExtraBoldItalic.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins-light';
+  src: url('./Poppins/Poppins-Light.ttf');
+}
+
+@font-face {
+
+  font-family: 'poppins-light';
+  font-style: italic;
+  src: url('./Poppins/Poppins-LightItalic.ttf');
+}
+
 html, body {
+
   height: 100vh;
 }
