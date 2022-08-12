@@ -1,4 +1,4 @@
-class t_subscriptions {
+export class t_subscriptions {
 
   events;
   subscriptions;
