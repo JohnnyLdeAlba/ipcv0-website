@@ -1,22 +1,77 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 
 import { styled } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
+import Button from "@mui/material/Button";
 import InputBase from '@mui/material/InputBase';
+
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 import { Header } from "./Header";
 import { Backdrop } from "./Backdrop";
+import { Card } from "./Card";
 
 import { getContext } from "./context";
+import { getMUITheme } from "./muiTheme";
 
 import "./style.css";
 
 const context = getContext();
 const theme = context.getTheme();
+const muiTheme = getMUITheme();
+
+function MetaMaskIcon() {
+
+  const Image = styled('img')({
+    marginRight: "24px",
+    width: "32px"
+  });
+
+  return (<Image src="assets/metamask.webp" />);
+}
+
+function WalletConnectIcon() {
+
+  const Image = styled('img')({
+    marginRight: "24px",
+    width: "32px"
+  });
+
+  return (<Image src="assets/walletconnect.webp" />);
+}
+
+function CardContainer(props) {
+
+  const _CardContainer = styled(Box)({
+
+    width: "100%",
+
+    "@media (min-width: 500px)": {
+      width: "450px"
+    }
+  });
+
+  return (<_CardContainer>{ props.children }</_CardContainer>);
+}
+
+function CardBody(props) {
+
+  const _CardBody = styled(Box)({
+
+    padding: "16px"
+  });
+
+  return (
+    <_CardBody>
+      { props.children }
+    </_CardBody>
+  );
+}
 
 function Layout(props) {
 
@@ -28,26 +83,69 @@ function Layout(props) {
     color: theme.textColor
   });
 
+  const List = styled(Box)({
+
+    display: "flex",
+    flexDirection: "column"
+  });
+
+  const ListItem = styled(Button)({
+
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "start",
+    padding: "16px",
+    borderRadius: "0px",
+    fontSize: "16px",
+    color: theme.textColor,
+    textTransform: "none"
+  });
+
+  const ListText = styled(Box)({
+
+    fontWeight: "bold"
+  });
+
   return (<>
-    <Backdrop>
-    ...
-    </Backdrop>
-    <_Layout>
-      <Header />
-      { props.children }
-    </_Layout>
+    <CssBaseline />
+    <ThemeProvider theme={ muiTheme }>
+      <Backdrop>
+    
+        <CardContainer>
+          <Card
+      	    icon={ <AccountBalanceWalletIcon /> }
+            title="Connect Wallet"
+	    subtitle="Choose your wallet provider"
+          >
+            <List>
+              <ListItem>
+	        <MetaMaskIcon /> <ListText>MetaMask</ListText> 
+	      </ListItem>
+              <ListItem onClick={ () => { context.getWalletProvider().connect(); } }>
+	        <WalletConnectIcon /> <ListText>Wallet Connect</ListText>
+	      </ListItem>
+	    </List>
+	  </Card>
+        </CardContainer>
+
+      </Backdrop>
+      <_Layout>
+        <Header />
+        { props.children }
+      </_Layout>
+    </ThemeProvider>
   </>);
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = document.getElementById('root');
 
-root.render(
+ReactDOM.render(
   <React.StrictMode>
-    <CssBaseline />
     <BrowserRouter>
       <Routes>
         <Route path="/" element={ <Layout /> } />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
+  root
 );

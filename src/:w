@@ -1,0 +1,138 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import CssBaseline from "@mui/material/CssBaseline";
+
+import { styled } from '@mui/material/styles';
+import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import InputBase from '@mui/material/InputBase';
+
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+
+import { Header } from "./Header";
+import { Backdrop } from "./Backdrop";
+
+import { getContext } from "./context";
+
+import "./style.css";
+
+const context = getContext();
+const theme = context.getTheme();
+
+function SubTitle(props) {
+
+  const _SubTitle = styled(Box)({
+
+    fontSize: "14px",
+    color: "#cccccc"
+  });
+
+  return (<_SubTitle>{ props.children }</_SubTitle>);
+}
+
+function Card(props) {
+
+  const _Card = styled(Box)({
+
+    width: "600px",
+    height: "600px",
+    borderRadius: "8px",
+    backgroundColor: theme.cardColor,
+
+    "@media (min-width: 600px)": {
+      borderRadius: "8px",
+    }
+  });
+
+  const CardTitle = styled(Box)({
+
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: "10px 16px",
+    borderRadius: "0px",
+    backgroundColor: theme.cardTitleColor,
+
+    "@media (min-width: 600px)": {
+      borderRadius: "8px 8px 0px 0px",
+    }
+  });
+
+  const TitleColumn = styled(Box)({
+
+    display: "flex",
+    flexDirection: "column"
+  });
+
+  const TitleIcon = styled(Box)({
+    marginRight: "16px",
+    color: theme.textColor
+  });
+
+  const Title = styled(Box)({
+
+    color: theme.textColor,
+    fontWeight: "bold",
+    letterSpacing: "0.2em"
+  });
+
+  const stopPropagation = (event) => {
+    event.stopPropagation();
+  };
+
+  return (
+    <_Card onClick={   }>
+      <CardTitle>
+	<TitleIcon>{ props.icon }</TitleIcon>
+        <TitleColumn>
+          <Title>{ props.title }</Title>
+
+	  { typeof props.subtitle == "undefined" ?
+	      "" : <SubTitle>{ props.subtitle }</SubTitle> }
+
+        </TitleColumn>
+      </CardTitle>
+    </_Card>
+  );
+}
+
+function Layout(props) {
+
+  const _Layout = styled(Box)({
+
+    height: "100vh", 
+    backgroundColor: theme.backgruondColor,
+    fontFamily: 'poppins-light',
+    color: theme.textColor
+  });
+
+  return (<>
+    <Backdrop>
+    
+      <Card
+	icon={ <AccountBalanceWalletIcon /> }
+        title="Title"
+	subtitle="Subtitle"
+      />
+
+    </Backdrop>
+    <_Layout>
+      <Header />
+      { props.children }
+    </_Layout>
+  </>);
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
+  <React.StrictMode>
+    <CssBaseline />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={ <Layout /> } />
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
+);

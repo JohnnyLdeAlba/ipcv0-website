@@ -3,6 +3,7 @@ import React from "react";
 import { styled } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
+import Button from "@mui/material/Button";
 import InputBase from '@mui/material/InputBase';
 
 import { Container } from "./Container";
@@ -104,7 +105,7 @@ export function Header(props) {
     padding: "24px 32px",
   });
 
-  const LogoSpan = styled(Box)({
+  const LogoRow = styled(Box)({
 
     display: "flex",
     flexDirection: "row",
@@ -117,14 +118,14 @@ export function Header(props) {
     justifyContent: "flex-end"
   });
 
-  const SearchStack = styled(Box)({
+  const SearchColumn = styled(Box)({
 
     flex: 2,
     display: "flex",
     flexDirection: "column",
   });
 
-  const MenuSpan = styled(Box)({
+  const MenuRow = styled(Box)({
     backgroundColor: theme.menuColor
   });
 
@@ -133,42 +134,57 @@ export function Header(props) {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    padding: "12px",
     fontSize: "16px"
   });
 
-  const MenuItem = styled(Box)({
+  const MenuItem = styled(Button)({
 
     cursor: "pointer",
-    padding: "0 16px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "start",
+
+    padding: "12px 10px",
+    borderRadius: "0px",
+
+    fontFamily: "poppins-light",
+    fontSize: "12px",
+    fontWeight: "normal", 
+    color: theme.textColor,
     textAlign: "center",
+
+    "@media (min-width: 600px)": {
+
+      padding: "12px 16px",
+      fontSize: "14px"
+    }
   });
 
   return (<>
     <_Header>
       <Container>
         <InnerContainer>
-	  <LogoSpan>
+	  <LogoRow>
             <Logo />
             <IOLogo />
-	  </LogoSpan>
-	  <SearchStack>
+	  </LogoRow>
+	  <SearchColumn>
 	    <SocialSpan>
               <OpenSeaIcon />
               <DiscordIcon />
 	    </SocialSpan>
-	  </SearchStack>
+	  </SearchColumn>
 	</InnerContainer>
       </Container>
-      <MenuSpan>
+      <MenuRow>
         <Container>
 	  <Menu>
 	    <MenuItem>About</MenuItem>
-	    <MenuItem>Wrap/Unwrap IPC</MenuItem>
+	    <MenuItem>Wrap/Unwrap IPCs</MenuItem>
 	    <MenuItem>Connect Wallet</MenuItem>
           </Menu>
 	</Container>
-      </MenuSpan>
+      </MenuRow>
     </_Header>
   </>);
 }
