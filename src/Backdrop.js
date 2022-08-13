@@ -26,7 +26,7 @@ function effectFactory(context, show) {
 
 export function Backdrop(props) {
 
-  const [ visible, show ] = React.useState(settings.backdropVisible);
+  const [ visible, show ] = React.useState(false);
   React.useEffect(effectFactory(context, show));
   const hide = () => { show(false); };
 
@@ -35,6 +35,7 @@ export function Backdrop(props) {
       open={ visible }
       onClick={ hide }
       transitionDuration={ theme.backdropTransition }
+      sx={{ zIndex: theme.backdropzIndex  }}
     >
       { props.children }
     </MUIBackdrop>

@@ -163,8 +163,14 @@ function ConnectMenuItem(props) {
     );
   }
 
+  const openAccountDialog = () => {
+
+    context.processSubscription("showBackdrop");
+    context.processSubscription("openAccountDialog");
+  };
+
   return (
-    <MenuItem>Account</MenuItem>
+    <MenuItem onClick={ openAccountDialog }>Account</MenuItem>
   );
 }
 

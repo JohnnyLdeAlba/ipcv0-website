@@ -10,12 +10,13 @@ const theme = context.getTheme();
 
 export function Card(props) {
 
-  const _Card = styled(Box)({
+  const Card = styled(Box)({
 
     margin: "16px",
     paddingBottom: "8px",
     borderRadius: "8px",
     backgroundColor: theme.cardColor,
+    overflow: "hidden"
   });
 
   const CardTitle = styled(Box)({
@@ -57,7 +58,7 @@ export function Card(props) {
   };
 
   return (
-    <_Card onClick={ stopPropagation }>
+    <Card onClick={ stopPropagation }>
       <CardTitle>
 	<TitleIcon>{ props.icon }</TitleIcon>
         <TitleColumn>
@@ -69,7 +70,7 @@ export function Card(props) {
         </TitleColumn>
       </CardTitle>
       { props.children }
-    </_Card>
+    </Card>
   );
 }
 

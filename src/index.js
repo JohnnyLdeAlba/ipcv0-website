@@ -10,12 +10,13 @@ import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import InputBase from '@mui/material/InputBase';
 
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
 import { Header } from "./Header";
 import { Backdrop } from "./Backdrop";
 import { Card } from "./Card";
 import { ConnectDialog } from "./ConnectDialog";
+import { AccountDialog } from "./AccountDialog";
 
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
@@ -55,6 +56,7 @@ function Layout(props) {
     <ThemeProvider theme={ muiTheme }>
       <Backdrop>
         <ConnectDialog /> 
+        <AccountDialog /> 
       </Backdrop>
       <_Layout>
         <Header />

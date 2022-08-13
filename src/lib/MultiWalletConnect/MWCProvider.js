@@ -47,7 +47,7 @@ class t_multi_wallet_connect extends t_subscriptions {
       case "0x1": return "Ethereum";
 
       // WalletConnect definitions.
-      case 1: return "Ethereum";
+      case "1": return "Ethereum";
     }
 
     return "Unknown";

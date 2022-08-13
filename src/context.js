@@ -4,13 +4,7 @@ import { getTheme } from "./theme";
 
 class t_settings {
 
-  backdropVisible;
-  connectDialogVisible;
-
   constructor() {
-
-    this.backdropVisible = false;
-    this.connectDialogVisible = false;
   }
 }
 

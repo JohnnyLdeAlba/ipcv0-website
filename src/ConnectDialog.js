@@ -6,12 +6,11 @@ import Button from "@mui/material/Button";
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 import { Card } from "./Card";
-import { List, ListItem } from "./Toolbox";
+import { List, ListButton } from "./Toolbox";
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
 
 const context = getContext();
-const settings = context.getSettings();
 const theme = context.getTheme();
 
 function MetaMaskIcon() {
@@ -79,9 +78,9 @@ function MetaMaskLI() {
   }
 
   return (
-    <ListItem onClick={ connect }>
+    <ListButton onClick={ connect }>
       <MetaMaskIcon /> <ListText>MetaMask</ListText> 
-    </ListItem>
+    </ListButton>
   );
 }
 
@@ -105,7 +104,7 @@ function effectFactory(context, show, visible) {
 
 export function ConnectDialog() {
 
-  const [ visible, show ] = React.useState(settings.connectDialogVisible);
+  const [ visible, show ] = React.useState(false);
   React.useEffect(effectFactory(context, show, visible));
 
   const hide = () => { show(false); };
@@ -125,9 +124,9 @@ export function ConnectDialog() {
       >
         <List>
 	  <MetaMaskLI />
-          <ListItem onClick={ connectWC }>
+          <ListButton onClick={ connectWC }>
 	    <WalletConnectIcon /> <ListText>Wallet Connect</ListText>
-    	  </ListItem>
+    	  </ListButton>
         </List>
       </Card>
     </CardContainer>
