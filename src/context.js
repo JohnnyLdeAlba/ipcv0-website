@@ -9,9 +9,23 @@ class t_settings {
 
   constructor() {
 
-    this.backdropVisible = true;
-    this.connectDialogVisible = true;
+    this.backdropVisible = false;
+    this.connectDialogVisible = false;
   }
+}
+
+function onConnectWallet(accountDetails) {
+
+  sessionStorage.setItem("providerName", accountDetails.providerName);
+  sessionStorage.setItem("chainId", accountDetails.chainId);
+  sessionStorage.setItem("account", accountDetails.account);
+}
+
+function onDisconnectWallet() {
+
+  sessionStorage.removeItem("providerName");
+  sessionStorage.removeItem("chainId");
+  sessionStorage.removeItem("account");
 }
 
 export class t_context extends t_subscriptions {
@@ -33,10 +47,11 @@ export class t_context extends t_subscriptions {
     this.createSubscription("openMWCDialog");
     this.createSubscription("openAccountDialog");
 
-    // this.addSubscriber("connect", "context", onConnectWallet);
-    // this.addSubscriber("disconnect", "context", onDisconnectWallet);
+    this.addSubscriber("connect", "context", onConnectWallet);
+    this.addSubscriber("disconnect", "context", onDisconnectWallet);
 
     this.settings = new t_settings();
+    this.autoConnect();
   }
 
   getSettings() { return this.settings; }
@@ -45,6 +60,22 @@ export class t_context extends t_subscriptions {
   getWalletProvider() {
     return this.mwc_provider;
   }
+
+  getSession() {
+
+    this.session = {
+
+      providerName: sessionStorage.getItem("providerName"),
+      chainId: sessionStorage.getItem("chainId"),
+      account: sessionStorage.getItem("account")
+    };
+  }
+
+  autoConnect() {
+
+    this.getSession();
+    this.mwc_provider.autoConnect(this.session);
+  }  
 }
 
 const context = new t_context();
