@@ -1,6 +1,6 @@
 import React from "react";
 
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
@@ -89,6 +89,85 @@ function DiscordIcon() {
   );
 }
 
+function MenuItem(props) {
+
+  const MenuItem = styled(Button)({
+
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "start",
+
+    padding: "12px 10px",
+    borderRadius: "0px",
+
+    fontFamily: "poppins-light",
+    fontSize: "12px",
+    fontWeight: "normal", 
+    color: theme.textColor,
+    textAlign: "center",
+
+    "@media (min-width: 600px)": {
+
+      padding: "12px 16px",
+      fontSize: "14px"
+    }
+  });
+
+  return (
+    <MenuItem onClick={ props.onClick }>
+      { props.children }
+    </MenuItem>
+  );
+}
+
+function effectFactory(context, setConnection) {
+
+  const walletProvider = context.getWalletProvider();
+
+  return () => {
+
+    context.addSubscriber("connect", "connectMenuItem", () => {
+      setConnection(walletProvider.isConnected());
+    });
+
+    context.addSubscriber("disconnect", "connectMenuItem", () => {
+      setConnection(walletProvider.isConnected());
+    });
+
+    return () => {
+
+      context.removeSubscriber("connect", "connectDialog");
+      context.removeSubscriber("disconnect", "connectDialog");
+    };
+  }
+}
+
+function ConnectMenuItem(props) {
+
+  const [ connected, setConnection ] = React.useState(
+    context.getWalletProvider().isConnected());
+
+  React.useEffect(effectFactory(context, setConnection));
+
+  const openConnectDialog = () => {
+
+    context.processSubscription("showBackdrop");
+    context.processSubscription("openConnectDialog");
+  };
+
+  if (!connected) {
+
+    return (
+      <MenuItem onClick={ openConnectDialog }>Connect Wallet</MenuItem>
+    );
+  }
+
+  return (
+    <MenuItem>Account</MenuItem>
+  );
+}
+
 export function Header(props) {
 
   const _Header = styled(Box)({
@@ -137,29 +216,6 @@ export function Header(props) {
     fontSize: "16px"
   });
 
-  const MenuItem = styled(Button)({
-
-    cursor: "pointer",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "start",
-
-    padding: "12px 10px",
-    borderRadius: "0px",
-
-    fontFamily: "poppins-light",
-    fontSize: "12px",
-    fontWeight: "normal", 
-    color: theme.textColor,
-    textAlign: "center",
-
-    "@media (min-width: 600px)": {
-
-      padding: "12px 16px",
-      fontSize: "14px"
-    }
-  });
-
   return (<>
     <_Header>
       <Container>
@@ -181,7 +237,7 @@ export function Header(props) {
 	  <Menu>
 	    <MenuItem>About</MenuItem>
 	    <MenuItem>Wrap/Unwrap IPCs</MenuItem>
-	    <MenuItem>Connect Wallet</MenuItem>
+	    <ConnectMenuItem />
           </Menu>
 	</Container>
       </MenuRow>

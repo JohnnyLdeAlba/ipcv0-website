@@ -15,6 +15,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { Header } from "./Header";
 import { Backdrop } from "./Backdrop";
 import { Card } from "./Card";
+import { ConnectDialog } from "./ConnectDialog";
 
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
@@ -24,40 +25,6 @@ import "./style.css";
 const context = getContext();
 const theme = context.getTheme();
 const muiTheme = getMUITheme();
-
-function MetaMaskIcon() {
-
-  const Image = styled('img')({
-    marginRight: "24px",
-    width: "32px"
-  });
-
-  return (<Image src="assets/metamask.webp" />);
-}
-
-function WalletConnectIcon() {
-
-  const Image = styled('img')({
-    marginRight: "24px",
-    width: "32px"
-  });
-
-  return (<Image src="assets/walletconnect.webp" />);
-}
-
-function CardContainer(props) {
-
-  const _CardContainer = styled(Box)({
-
-    width: "100%",
-
-    "@media (min-width: 500px)": {
-      width: "450px"
-    }
-  });
-
-  return (<_CardContainer>{ props.children }</_CardContainer>);
-}
 
 function CardBody(props) {
 
@@ -83,51 +50,11 @@ function Layout(props) {
     color: theme.textColor
   });
 
-  const List = styled(Box)({
-
-    display: "flex",
-    flexDirection: "column"
-  });
-
-  const ListItem = styled(Button)({
-
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "start",
-    padding: "16px",
-    borderRadius: "0px",
-    fontSize: "16px",
-    color: theme.textColor,
-    textTransform: "none"
-  });
-
-  const ListText = styled(Box)({
-
-    fontWeight: "bold"
-  });
-
   return (<>
     <CssBaseline />
     <ThemeProvider theme={ muiTheme }>
       <Backdrop>
-    
-        <CardContainer>
-          <Card
-      	    icon={ <AccountBalanceWalletIcon /> }
-            title="Connect Wallet"
-	    subtitle="Choose your wallet provider"
-          >
-            <List>
-              <ListItem>
-	        <MetaMaskIcon /> <ListText>MetaMask</ListText> 
-	      </ListItem>
-              <ListItem onClick={ () => { context.getWalletProvider().connect(); } }>
-	        <WalletConnectIcon /> <ListText>Wallet Connect</ListText>
-	      </ListItem>
-	    </List>
-	  </Card>
-        </CardContainer>
-
+        <ConnectDialog /> 
       </Backdrop>
       <_Layout>
         <Header />

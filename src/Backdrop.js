@@ -6,7 +6,7 @@ const context = getContext();
 const settings = context.getSettings();
 const theme = context.getTheme();
 
-function effectFactory(context, show, visible) {
+function effectFactory(context, show) {
 
   return () => {
 
@@ -27,7 +27,7 @@ function effectFactory(context, show, visible) {
 export function Backdrop(props) {
 
   const [ visible, show ] = React.useState(settings.backdropVisible);
-  React.useEffect(effectFactory(context, show, visible));
+  React.useEffect(effectFactory(context, show));
   const hide = () => { show(false); };
 
   return (

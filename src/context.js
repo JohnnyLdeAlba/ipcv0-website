@@ -5,10 +5,12 @@ import { getTheme } from "./theme";
 class t_settings {
 
   backdropVisible;
+  connectDialogVisible;
 
   constructor() {
 
     this.backdropVisible = true;
+    this.connectDialogVisible = true;
   }
 }
 
