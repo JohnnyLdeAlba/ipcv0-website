@@ -1,5 +1,6 @@
 import WalletConnect from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
+import { t_subscriptions } from "../subscriptions";
 
 function factoryConnect(wc_provider) {
 
@@ -26,7 +27,7 @@ function factoryConnect(wc_provider) {
     wc_provider.chainId = chainId;
     wc_provider.account = accounts[0];
 
-    wc_provider.subscriptions
+    wc_provider
       .processSubscription("connect",
         wc_provider.getAccountDetails());
 
@@ -61,7 +62,7 @@ function factorySessionUpdate(wc_provider) {
     wc_provider.chainId = chainId;
     wc_provider.account = accounts[0];
 
-    wc_provider.subscriptions
+    wc_provider
       .processSubscription("sessionUpdate",
         wc_provider.getAccountDetails());
 
@@ -90,7 +91,7 @@ function factoryDisconnect(wc_provider) {
       return;
     }
 
-    wc_provider.subscriptions
+    wc_provider
       .processSubscription("disconnect",
         wc_provider.getAccountDetails());
 
@@ -101,7 +102,7 @@ function factoryDisconnect(wc_provider) {
   };
 }
 
-class t_wallet_connect {
+class t_wallet_connect extends t_subscriptions {
 
   providerName;
   chainId;
@@ -110,9 +111,9 @@ class t_wallet_connect {
   provider;  
   responce;
 
-  subscriptions;
-
   constructor() {
+
+    super();
 
     this.provider = null;
     this.providerName = "WalletConnect";
@@ -161,10 +162,10 @@ class t_wallet_connect {
 
     const wc_provider = this;
 
-    this.subscriptions.addSubscriber(
+    this.addSubscriber(
       "sessionUpdate", "wcAutoConnect", () => {
 
-      wc_provider.subscriptions.removeSubscriber(
+      wc_provider.removeSubscriber(
         "sessionUpdate", "wcAutoConnect");
 
       if (session.account != wc_provider.account) {

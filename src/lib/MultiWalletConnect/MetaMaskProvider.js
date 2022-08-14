@@ -1,4 +1,5 @@
 import detectEthereumProvider from '@metamask/detect-provider';
+import { t_subscriptions } from "../subscriptions";
 
 function factoryConnect(mm_provider) {
 
@@ -33,7 +34,7 @@ function factoryChainRequest(mm_provider) {
     mm_provider.connected = true;
     mm_provider.chainId = chainId;
 
-    mm_provider.subscriptions
+    mm_provider
       .processSubscription("connect",
         mm_provider.getAccountDetails());
   }
@@ -52,7 +53,7 @@ function factoryChainChanged(mm_provider) {
     mm_provider.connected = true;
     mm_provider.chainId = chainId;
 
-    mm_provider.subscriptions
+    mm_provider
       .processSubscription("sessionUpdate",
         mm_provider.getAccountDetails());
   }
@@ -70,7 +71,7 @@ function factoryAccountsChanged(mm_provider) {
 
     mm_provider.account = accounts[0];
 
-    mm_provider.subscriptions
+    mm_provider
       .processSubscription("sessionUpdate",
         mm_provider.getAccountDetails());
   };
@@ -105,7 +106,7 @@ function factoryError(mm_provider) {
   };
 }
 
-class t_metamask {
+class t_metamask extends t_subscriptions {
 
   provider;
   providerName;
@@ -115,10 +116,9 @@ class t_metamask {
   connected;
   response;
 
-  subscriptions;
-
   constructor() {
 
+    super();
     this.provider = null;
     this.providerEnabled = false;
     this.providerName = "MetaMask";
@@ -192,9 +192,8 @@ class t_metamask {
     this.chainId = chainId;
     this.account = accounts[0];
 
-    this.subscriptions
-      .processSubscription("connect",
-        this.getAccountDetails());
+    this.processSubscription("connect",
+      this.getAccountDetails());
   }
 
   async autoConnect(session) {
@@ -226,7 +225,7 @@ class t_metamask {
     this.account = null;
     this.provider = null;
 
-    this.subscriptions
+    this
       .processSubscription("disconnect",
         this.getAccountDetails());
   }

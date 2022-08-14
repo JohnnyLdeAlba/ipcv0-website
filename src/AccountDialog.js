@@ -173,10 +173,14 @@ export function AccountDialog() {
     height: "32px"
   });
 
-  const connectWC = () => {
+  const buttonStyle = {
+    margin: "8px 24px"
+  };
+
+  const disconnectWC = () => {
   
-    context.getWalletProvider().connect();
-    context.processSubscription("closeConnectDialog");
+    context.getWalletProvider().disconnect();
+    context.processSubscription("closeAccountDialog");
     context.processSubscription("hideBackdrop");
   };
 
@@ -200,6 +204,8 @@ export function AccountDialog() {
 	    <WalletIcon />
 	    <ListText caption="Wallet Address" subcaption={ accountDetails.account } />
     	  </ListItem>
+          
+          <Button variant="contained" onClick={ disconnectWC } sx={ buttonStyle }>Disconnect</Button>
         </List>
       </Card>
     </CardContainer>

@@ -7,8 +7,8 @@ const muiTheme = createTheme({
 
   palette: {
 
-    primary: { main: theme.highlightColor },
-    secondary: { main: theme.highlightColor },
+    primary: { main: theme.primaryColor },
+    secondary: { main: theme.primaryColor },
     background: { default: theme.backgroundColor }
   }
 });

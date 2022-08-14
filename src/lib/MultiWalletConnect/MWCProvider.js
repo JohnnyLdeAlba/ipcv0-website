@@ -10,6 +10,7 @@ class t_multi_wallet_connect extends t_subscriptions {
   constructor() {
 
     super();
+
     this.mm_provider = null;
     this.wc_provider = null;
   }
@@ -23,8 +24,8 @@ class t_multi_wallet_connect extends t_subscriptions {
     this.createSubscription("disconnect");
     this.createSubscription("sessionUpdate");
 
-    this.mm_provider.subscriptions = this;
-    this.wc_provider.subscriptions = this;
+    this.mm_provider.subscriptions = this.subscriptions;
+    this.wc_provider.subscriptions = this.subscriptions;
 
     await this.mm_provider.initialize();
     await this.wc_provider.initialize();

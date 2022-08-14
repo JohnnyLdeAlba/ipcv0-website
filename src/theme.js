@@ -9,7 +9,8 @@ const theme = {
   cardColor: "#0d1117",
   cardTitleColor: "#161b22",
   backdropTransition: 500,
-  backdropzIndex: 9999
+  backdropzIndex: 9999,
+  primaryColor: "#272c33"
 }
 
 export function getTheme() {
