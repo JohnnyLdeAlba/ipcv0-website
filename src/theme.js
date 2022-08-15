@@ -4,7 +4,7 @@ const theme = {
   textHighlightColor: "#8597aa",
   highlightColor: "#9fb1c5",
   rowHighligtColor: "#22272e",
-  backgruondColor: "#010409",
+  backgroundColor: "#010409",
   headerColor: "#0d1117",
   menuColor: "#161b22",
   cardColor: "#0d1117",

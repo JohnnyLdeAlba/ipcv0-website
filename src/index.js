@@ -86,19 +86,22 @@ function Row(props) {
     borderWidth: "1px 0 1px 0",
   });
 
-  return (<Caption>{ props.children }</Caption>);
+  return (
+    <Caption className={ props.className }>
+      { props.children }
+    </Caption>
+  );
 }
 
 function Avatar(props) {
 
   const Avatar = styled(Box)({
-
     width: "80px",
-    color: theme.textColor
   });
 
   return (
-    <Avatar>{ props.children  }
+    <Avatar>
+      { props.children  }
     </Avatar>
   );
 }
@@ -121,7 +124,8 @@ function Action(props) {
   });
 
   return (
-    <Action>{ props.children }
+    <Action>
+      { props.children }
     </Action>
   );
 }
@@ -130,14 +134,17 @@ function RowSpan(props) {
 
   const RowSpan = styled(Box)({
 
+    boxSizing: "border-box",
     flex: 2,
     display: "flex",
     flexDirection: "column",
+    padding: "8px 0",
 
-    "@media (min-width: 300px)": {
+    "@media (min-width: 430px)": {
 
       display: "flex",
       flexDirection: "row",
+      padding: "0",
     }
   });
 
@@ -150,15 +157,44 @@ function RowSpan(props) {
 
 function RowItem(props) {
 
+  switch (props.type) {
+
+    case "gender":
+      return (<Gender className={ props.className }>{ props.children }</Gender>);
+    case "height":
+      return (<Height className={ props.className }>{ props.children }</Height>);
+    case "handedness":
+      return (<Handedness className={ props.className }>{ props.children }</Handedness>);
+  }
+
+  const Label = styled(Box)({
+
+    display: "inline",
+    marginRight: "12px",
+    fontWeight: "bold",
+
+    "@media (min-width: 430px)": {
+
+      display: "none",
+      marginBottom: "0",
+    }
+  });
+
   const RowItem = styled(Box)({
 
+    padding: "4px 8px 4px 0",
     width: "100%",
     fontSize: "14px",
     textAlign: "left",
 
     "@media (min-width: 430px)": {
+
+      display: "block",
+      flexDirection: "initial",
+
+      padding: "0",
       width: "50%",
-      textAlign: "center"
+      textAlign: "center",
     },
 
     "@media (min-width: 600px)": {
@@ -177,6 +213,7 @@ function RowItem(props) {
 
   return (
     <RowItem className={ props.className }>
+      { props.label ? <Label>{ props.label }</Label> : <></> }
       { props.children }
     </RowItem>
   );
@@ -187,7 +224,8 @@ function Handedness(props) {
 
   const Handedness = styled(RowItem)({
 
-    "@media (min-width: 300px)": {
+    display: "block",
+    "@media (min-width: 430px)": {
       display: "none"
     },
 
@@ -198,7 +236,10 @@ function Handedness(props) {
   });
 
   return (
-    <Handedness className={ props.className }>
+    <Handedness
+      label={ props.label }
+      className={ props.className }
+    >
       { props.children }
     </Handedness>
   );
@@ -208,7 +249,8 @@ function Height(props) {
 
   const Height = styled(RowItem)({
 
-    "@media (min-width: 300px)": {
+    display: "block",
+    "@media (min-width: 430px)": {
       display: "none"
     },
 
@@ -218,14 +260,23 @@ function Height(props) {
 
   });
 
-  return (<Height>{ props.children }</Height>);
+  return (
+    <Height
+      label={ props.label }
+      className={ props.className }
+    >
+      { props.children }
+    </Height>
+  );
 }
 
 function Gender(props) {
 
   const Gender = styled(RowItem)({
 
-    "@media (min-width: 300px)": {
+    display: "block",
+
+    "@media (min-width: 430px)": {
       display: "none"
     },
 
@@ -235,25 +286,13 @@ function Gender(props) {
 
   });
 
-  return (<Gender>{ props.children }</Gender>);
-}
-
-
-function Race(props) {
-
-  const Race = styled(RowItem)({
-
-    "@media (min-width: 300px)": {
-      display: "none"
-    },
-
-    "@media (min-width: 430px)": {
-      display: "block"
-    }
-
-  });
-
-  return (<Race>{ props.children }</Race>);
+  return (
+    <Gender
+      label={ props.label }
+      className={ props.className }
+    >
+      { props.children }
+    </Gender>);
 }
 
 function WrapRow(props) {
@@ -273,16 +312,15 @@ function WrapRow(props) {
     fontSize: "12px"
   });
 
-
   return (
     <Row>
-      <Avatar><Image src="gif/1.gif" /></Avatar>
+      <Avatar><Image src={ "gif/" + ipc.token_id + ".gif" }/></Avatar>
       <RowSpan>
-        <RowItem>#{ ipc.token_id }</RowItem>
-        <Race>{ ipc.subrace }</Race>
-        <Gender>{ ipc.gender }</Gender>
-        <Height>{ ipc.height }</Height>
-        <Handedness>{ ipc.handedness }</Handedness>
+        <RowItem label="Name">#{ ipc.token_id }</RowItem>
+        <RowItem label="Race">{ ipc.subrace }</RowItem>
+        <Gender label="Gender">{ ipc.gender }</Gender>
+        <Height label="Height">{ ipc.height }</Height>
+        <Handedness label="Handed">{ ipc.handedness }</Handedness>
       </RowSpan>
       <Action>
         <SmButton variant="contained">View</SmButton>
@@ -297,6 +335,16 @@ function WrapDialog(props) {
   const database = context.getDatabase();
 
   const ipc = database[0];
+
+  const CaptionRow = styled(Row)({
+
+    display: "none",
+    padding: "8px 0",
+
+    "@media (min-width: 430px)": {
+      display: "flex"
+    }
+  });
 
   const Caption = styled(RowSpan)({
     padding: "16px 0"
@@ -317,19 +365,19 @@ function WrapDialog(props) {
     >
       <Table>
 
-        <Row>
+        <CaptionRow>
           <Avatar>&nbsp;</Avatar>
 	  <Caption>
 	    <CaptionItem>Token Id</CaptionItem>
-	    <CaptionItem type="race">Race</CaptionItem>
+	    <CaptionItem>Race</CaptionItem>
 	    <CaptionItem type="gender">Gender</CaptionItem>
 	    <CaptionItem type="height">Height</CaptionItem>
 	    <CaptionItem type="handedness">Handedness</CaptionItem>
 	  </Caption>
           <Action>&nbsp;</Action>
-	</Row>
+	</CaptionRow>
 
-	<WrapRow ipc={ ipc } />
+  	<WrapRow ipc={ ipc } />
 
         <Box sx={{ padding: "12px 16px 8px 16px" }}>
           <Box sx={{ fontSize: "14px", textAlign: "right" }}>1 of 1 &nbsp; &lt; &nbsp; &gt;</Box>
@@ -344,8 +392,8 @@ function Layout(props) {
 
   const _Layout = styled(Box)({
 
-    height: "100vh", 
-    backgroundColor: theme.backgruondColor,
+    height: "100vh",
+    backgroundColor: theme.backgroundColor,
     fontFamily: 'poppins-light',
     color: theme.textColor
   });
