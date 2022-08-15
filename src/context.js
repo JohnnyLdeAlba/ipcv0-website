@@ -41,7 +41,7 @@ export class t_context extends t_subscriptions {
     this.mwc_provider.initialize();
 
     this.ipc_contract = createIPCContract();
-    this.ipc_contract.mwc_provider = this;
+    this.ipc_contract.mwc_provider = this.mwc_provider;
     this.mwc_provider.subscriptions = this.subscriptions;
 
     this.createSubscription("connect");
@@ -54,8 +54,9 @@ export class t_context extends t_subscriptions {
     this.addSubscriber("disconnect", "context", onDisconnectWallet);
 
     this.mwc_provider.setProviderURI(config.providerURI);
-    this.autoConnect();
+    this.ipc_contract.initialize();
 
+    await this.autoConnect();
     await this.loadDatabase();
   }
 

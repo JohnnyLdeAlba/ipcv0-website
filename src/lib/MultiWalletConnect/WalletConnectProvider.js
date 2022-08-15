@@ -26,8 +26,8 @@ function factoryConnect(wc_provider) {
       return;
     }
 
-    wc_provider.createWeb3Session();
-
+    wc_provider.web3_provider.enable();
+    wc_provider.connected = true;
     wc_provider.chainId = chainId;
     wc_provider.account = accounts[0];
 
@@ -63,6 +63,7 @@ function factorySessionUpdate(wc_provider) {
 
     const { accounts, chainId } = payload.params[0];
 
+    wc_provider.connected = true;
     wc_provider.chainId = chainId;
     wc_provider.account = accounts[0];
 
@@ -116,6 +117,7 @@ class t_wallet_connect extends t_subscriptions {
   web3_provider;
   providerURI;
   responce;
+  connected;
 
   constructor() {
 
@@ -129,6 +131,7 @@ class t_wallet_connect extends t_subscriptions {
     this.defaultChainId = 1;
     this.account = null;
     this.responce = null;
+    this.connected = false;
   }
 
   setProviderURI(uri) {
@@ -140,28 +143,29 @@ class t_wallet_connect extends t_subscriptions {
   }
 
   initialize() {
-
-    this.provider = new WalletConnect({
+   
+    const web3_provider = new WalletConnectProvider({	    
+      rpc: { 1: this.providerURI },
       bridge: "https://bridge.walletconnect.org",
       qrcodeModal: QRCodeModal
     });
+
+    const provider = web3_provider.connector;
+/*
+    const web3_provider = new WalletConnectProvider({
+      rpc: { 1: this.providerURI }
+    });
+*/
+    this.provider = provider;
+    this.web3_provider = web3_provider;
 
     const onConnect = factoryConnect(this);
     const onSessionUpdate = factorySessionUpdate(this);
     const onDisconnect = factoryDisconnect(this);
 
-    this.provider.on("connect", onConnect);
-    this.provider.on("session_update", onSessionUpdate);
-    this.provider.on("disconnect", onDisconnect);
-  }
-
-  createWeb3Provider() {
-
-    const web3_provider = new WalletConnectProvider({
-      rpc: { 1: this.providerURI }
-    });
-
-    web3_provider.enable();
+    provider.on("connect", onConnect);
+    provider.on("session_update", onSessionUpdate);
+    provider.on("disconnect", onDisconnect);
   }
 
   getWeb3Provider() {
@@ -170,20 +174,20 @@ class t_wallet_connect extends t_subscriptions {
 
   autoConnect(session) {
 
+    if (typeof session == "undefined") {
+
+      this.disconnect();
+      return;
+    }
+
+    if (session.chainId != this.defaultChainId) {
+
+      this.disconnect();
+      return;
+    }
+
     if (this.provider == null)
       this.initialize();
-
-    if (!this.isConnected())
-      return;
-
-    if (typeof session != 'undefined') {
-
-      if (session.chainId != this.defaultChainId) {
-
-        this.disconnect();
-        return;
-      }
-    }
 
     const wc_provider = this;
 
@@ -200,6 +204,7 @@ class t_wallet_connect extends t_subscriptions {
       }
     });
 
+    this.web3_provider.enable();
     this.provider.updateSession({
       chainId: session.chainId,
       accounts: [ session.account ]
@@ -221,12 +226,14 @@ class t_wallet_connect extends t_subscriptions {
 
         this.provider = null;
         this.initialize();
+
         this.provider.createSession();
+
 
         clearInterval(intervalId);
       }
 
-    }, 5);
+    }, 10);
   }
 
   disconnect() {
@@ -234,6 +241,7 @@ class t_wallet_connect extends t_subscriptions {
     if (this.provider?.connected)
       this.provider.killSession();
 
+    this.connected = false;
     this.chainId = null;
     this.account = null;
     this.provider = null;
@@ -241,11 +249,7 @@ class t_wallet_connect extends t_subscriptions {
   }
 
   isConnected() {
-
-    if (this.provider)
-      return this.provider.connected ? true : false;
-
-    return false;
+    return this.connected;
   }
 
   getAccountDetails(f) {

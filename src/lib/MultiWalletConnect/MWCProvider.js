@@ -52,6 +52,7 @@ class t_multi_wallet_connect extends t_subscriptions {
       case "0x1": return "Ethereum";
 
       // WalletConnect definitions.
+      case 1: return "Ethereum";
       case "1": return "Ethereum";
     }
 
@@ -86,16 +87,15 @@ class t_multi_wallet_connect extends t_subscriptions {
       case 'MetaMask': {
 
         this.mm_provider.autoConnect(session);
-        break;
+        return;
       }
 
-      default: {
+      case 'WalletConnect': {
 
         this.wc_provider.autoConnect(session);
-        break;
+        return;
       }
     }
-
   }
 
   connect(id) {
