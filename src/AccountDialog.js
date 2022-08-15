@@ -14,7 +14,6 @@ import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
 
 const context = getContext();
-const settings = context.getSettings();
 const theme = context.getTheme();
 
 function MetaMaskIcon() {

@@ -31,6 +31,10 @@ class t_multi_wallet_connect extends t_subscriptions {
     await this.wc_provider.initialize();
   }
 
+  setProviderURI(uri) {
+    this.wc_provider.setProviderURI(uri);
+  }
+
   setDefaultChainId(defaultChainId) {
 
     if (typeof defaultChainId == "undefined")
@@ -133,6 +137,17 @@ class t_multi_wallet_connect extends t_subscriptions {
       return true;
 
     return false;
+  }
+
+  getWeb3Provider() {
+
+    if (this.mm_provider.isConnected())
+      return this.mm_provider.getWeb3Provider();
+
+    else if (this.wc_provider.isConnected())
+      return this.wc_provider.getWeb3Provider();
+
+    return null;
   }
 
   getAccountDetails() {

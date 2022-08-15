@@ -2,13 +2,9 @@ import { t_subscriptions } from "./lib/subscriptions";
 import { createMWCProvider } from "./lib/MultiWalletConnect/MWCProvider";
 
 import { IPCLib } from "./lib/ipc-lib";
+
+import { getConfig } from "./config";
 import { getTheme } from "./theme";
-
-class t_settings {
-
-  constructor() {
-  }
-}
 
 function onConnectWallet(accountDetails) {
 
@@ -27,7 +23,6 @@ function onDisconnectWallet() {
 export class t_context extends t_subscriptions {
 
   mwc_provider;
-  settings;
   database;
 
   constructor() {
@@ -37,6 +32,8 @@ export class t_context extends t_subscriptions {
   }
 
   async initialize() {
+
+    const config = this.getConfig();
 
     this.mwc_provider = createMWCProvider();
     this.mwc_provider.subscriptions = this.subscriptions;
@@ -51,13 +48,13 @@ export class t_context extends t_subscriptions {
     this.addSubscriber("connect", "context", onConnectWallet);
     this.addSubscriber("disconnect", "context", onDisconnectWallet);
 
-    this.settings = new t_settings();
-
+    this.mwc_provider.setProviderURI(config.providerURI);
     this.autoConnect();
+
     await this.loadDatabase();
   }
 
-  getSettings() { return this.settings; }
+  getConfig() { return getConfig(); }
   getTheme() { return getTheme(); }
 
   getWalletProvider() {

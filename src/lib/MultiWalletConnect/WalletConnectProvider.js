@@ -1,4 +1,6 @@
 import WalletConnect from "@walletconnect/client";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import { t_subscriptions } from "../subscriptions";
 
@@ -23,6 +25,8 @@ function factoryConnect(wc_provider) {
       wc_provider.disconnect();
       return;
     }
+
+    wc_provider.createWeb3Session();
 
     wc_provider.chainId = chainId;
     wc_provider.account = accounts[0];
@@ -109,6 +113,8 @@ class t_wallet_connect extends t_subscriptions {
   defaultChainId;
   account;
   provider;  
+  web3_provider;
+  providerURI;
   responce;
 
   constructor() {
@@ -117,10 +123,16 @@ class t_wallet_connect extends t_subscriptions {
 
     this.provider = null;
     this.providerName = "WalletConnect";
+    this.providerURI = "";
+    this.web3_provider = null;
     this.chainId = null;
     this.defaultChainId = 1;
     this.account = null;
     this.responce = null;
+  }
+
+  setProviderURI(uri) {
+    this.providerURI = uri;
   }
 
   setDefaultChainId(chainId) {
@@ -141,6 +153,19 @@ class t_wallet_connect extends t_subscriptions {
     this.provider.on("connect", onConnect);
     this.provider.on("session_update", onSessionUpdate);
     this.provider.on("disconnect", onDisconnect);
+  }
+
+  createWeb3Provider() {
+
+    const web3_provider = new WalletConnectProvider({
+      rpc: { 1: this.providerURI }
+    });
+
+    web3_provider.enable();
+  }
+
+  getWeb3Provider() {
+    return this.web3_provider;
   }
 
   autoConnect(session) {
@@ -212,6 +237,7 @@ class t_wallet_connect extends t_subscriptions {
     this.chainId = null;
     this.account = null;
     this.provider = null;
+    this.web3_provider = null;
   }
 
   isConnected() {

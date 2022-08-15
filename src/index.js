@@ -1,3 +1,9 @@
+import contractABI from "./ipc-wrapper-abi.json";
+
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
+
+import { ethers } from "ethers";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -334,7 +340,7 @@ function WrapDialog(props) {
 
   const database = context.getDatabase();
 
-  const ipc = database[0];
+  const ipc = database[943];
 
   const CaptionRow = styled(Row)({
 
@@ -354,13 +360,49 @@ function WrapDialog(props) {
     fontWeight: "bold"
   });
 
+  const onClick = async () => {
+
+    console.log("test");
+
+    const wcprovider = new WalletConnectProvider({
+	    rpc: { 1: "https://eth-mainnet.g.alchemy.com/v2/SYJS-Zaeo1W7JJNFsV8-ZeUJigU5VyNk" }
+    });
+
+    wcprovider.enable();
+
+    const provider = new ethers.providers.Web3Provider(wcprovider);
+
+    // check if connected
+    // await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    console.log("Account:", await signer.getAddress());
+
+    const wrapAddress = "0xD0f54E91ee2e57EA72B0836565E8dfFDb0a5F950";
+
+    const contract = new ethers.Contract(wrapAddress, contractABI, signer);
+
+    let message = contract.filters.Wrapped();
+    
+    console.log(message);
+   
+    return;
+
+    message = await contract.approve("0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D", 944)
+      .catch((error) => {
+
+        console.log(error);
+    });
+
+    console.log(message);
+  };
+
   return (
 
     <CardContainer show={ true }>
 
     <Card
       icon={ <LockIcon />  }
-      title="Wrap"
+      title="Wrap/Unwrap IPCs"
       subtitle="Wrap individual tokens"
     >
       <Table>

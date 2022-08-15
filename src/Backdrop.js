@@ -3,7 +3,6 @@ import MUIBackdrop from "@mui/material/Backdrop";
 import { getContext } from "./context";
 
 const context = getContext();
-const settings = context.getSettings();
 const theme = context.getTheme();
 
 function effectFactory(context, show) {

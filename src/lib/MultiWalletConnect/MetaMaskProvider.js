@@ -155,6 +155,10 @@ class t_metamask extends t_subscriptions {
     this.providerEnabled = true;
   }
 
+  getWeb3Provider() {
+    return this.provider;
+  }
+
   isProvider() { return this.providerEnabled; }
 
   async mobileConnect(session) {
