@@ -43,6 +43,7 @@ export function Card(props) {
   const Title = styled(Box)({
 
     color: theme.textColor,
+    fontSize: "16px",
     fontWeight: "bold",
     letterSpacing: "0.2em"
   });

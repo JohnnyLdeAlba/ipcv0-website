@@ -31,12 +31,8 @@ export class t_context extends t_subscriptions {
   database;
 
   constructor() {
+
     super();
-
-    this.database = null;
-  }
-
-  async initialize() {
 
     this.mwc_provider = createMWCProvider();
     this.mwc_provider.subscriptions = this.subscriptions;
@@ -54,7 +50,7 @@ export class t_context extends t_subscriptions {
     this.settings = new t_settings();
 
     this.autoConnect();
-    await this.loadDatabase();
+    this.loadDatabase();
   }
 
   getSettings() { return this.settings; }
@@ -92,8 +88,6 @@ export class t_context extends t_subscriptions {
 
     this.database = database;
   }
-
-  getDatabase() { return this.database; }
 }
 
 const context = new t_context();
