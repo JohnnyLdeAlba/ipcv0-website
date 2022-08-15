@@ -1,6 +1,6 @@
 import { t_subscriptions } from "./lib/subscriptions";
 import { createMWCProvider } from "./lib/MultiWalletConnect/MWCProvider";
-
+import { createIPCContract } from "./lib/ipc-contract";
 import { IPCLib } from "./lib/ipc-lib";
 
 import { getConfig } from "./config";
@@ -23,6 +23,7 @@ function onDisconnectWallet() {
 export class t_context extends t_subscriptions {
 
   mwc_provider;
+  ipc_contract;
   database;
 
   constructor() {
@@ -38,6 +39,10 @@ export class t_context extends t_subscriptions {
     this.mwc_provider = createMWCProvider();
     this.mwc_provider.subscriptions = this.subscriptions;
     this.mwc_provider.initialize();
+
+    this.ipc_contract = createIPCContract();
+    this.ipc_contract.mwc_provider = this;
+    this.mwc_provider.subscriptions = this.subscriptions;
 
     this.createSubscription("connect");
     this.createSubscription("disconnect");

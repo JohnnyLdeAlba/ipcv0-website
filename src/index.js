@@ -1,7 +1,6 @@
-import contractABI from "./ipc-wrapper-abi.json";
+import contractABI from "./lib/ipc-wrapper-abi.json";
 
 import WalletConnectProvider from "@walletconnect/web3-provider";
-
 
 import { ethers } from "ethers";
 import React from "react";
