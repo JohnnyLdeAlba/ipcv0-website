@@ -86,7 +86,7 @@ function WrapDialog(props) {
 
   const [ update, setUpdate ] = React.useState(0);
 
-  const ownersTokens = ipc_database.getOwnersTokens(1, 100);
+  const ownersTokens = ipc_database.getOwnersTokens(0, 100);
 
   React.useEffect(async () => {
 
@@ -95,11 +95,12 @@ function WrapDialog(props) {
       await ipc_database.loadOwnersTokens(
         "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
         false,
-	"wraped"
+	"wrapped"
       );
 
       setUpdate(update + 1);
 
+      // chosing wrap should update database list.
       // add events here...reconnect, sessionupdate, disconnect
       // must trigger panel update...
     }

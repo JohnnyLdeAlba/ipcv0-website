@@ -57,7 +57,7 @@ class t_ipc_database extends t_subscriptions {
 
     for (let index = 0; index < tokenIdList.length; index++) {
 
-      const token = this.database[tokenIdList[index] + 1];
+      const token = this.database[tokenIdList[index] - 1];
 
       token.approved = approved;
       tokenList.push(token);
@@ -85,7 +85,7 @@ class t_ipc_database extends t_subscriptions {
 
     for (let index = 0; index < tokenIdList.length; index++) {
 
-      const token = this.database[tokenIdList[index] + 1];
+      const token = this.database[tokenIdList[index] - 1];
 
       token.approved = approved;
       token.wrapped = true;
@@ -98,11 +98,11 @@ class t_ipc_database extends t_subscriptions {
 
   async loadOwnersTokens(owner, approved, type, sort) {
 
-    type = type ? "wraped" : "unwraped";
-    sort = sort ? "desc" : "asc";
+    type = (typeof type == "undefined" || type == "wrapped") ? "wrapped" : "unwrapped";
+    sort = (typeof sort == "undefined" || sort == "desc") ? "desc" : "asc";
     
     let ownersTokens = null;
-    if (type == "wraped")
+    if (type == "wrapped")
       ownersTokens = await this.getWrappedList(owner, approved);
     else
       ownersTokens = await this.getUnwrappedList(owner, approved);
