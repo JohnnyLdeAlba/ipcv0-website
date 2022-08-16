@@ -304,6 +304,12 @@ function WrapRow(props) {
 
   const ipc = props.ipc;
 
+  const [ approvePending, setApprovePending ] = React.useState(false);
+  const [ approveVisible, showApproveButton ] = React.useState(true);
+
+  const [ wrapPending, setWrapPending ] = React.useState(false);
+  const [ wrapVisible, showWrapButton ] = React.useState(false);
+
   const Image = styled("img")({
 
     width: "80px",
@@ -317,7 +323,8 @@ function WrapRow(props) {
     fontSize: "12px"
   });
 
-  const buttonLabel = "Pending";
+  const approveLabel = approvePending ? "Pending" : "Approve";
+  const wrapLabel = wrapPending ? "Pending" : "Wrap";
 
   return (
     <Row>
@@ -331,85 +338,27 @@ function WrapRow(props) {
       </RowSpan>
       <Action>
         <SmButton variant="contained">View</SmButton>
-        <SmButton variant="contained">{ buttonLabel }</SmButton>
+        <SmButton variant="contained"></SmButton>
       </Action>
     </Row>
   );
 }
 
-class t_approval_event {
+function ApproveButton(props) {
 
-  resource_id;
-  tokenId;
+  const [ visible, show ] = React.useState(true);
+  const [ pending, setPending ] = React.useState(false);
 
-  setApproveLabel;
-  hideApproveButton;
-  showWrapButton;
+  const display = visible ? "inline-flex" : "none"; 
+  const label = pending ? "Pending" : "Approve";
 
-  constructor() {
+  const ApproveButton = styled(Button)({
+    display: display
+  });
 
-    this.resource_id = 0;
-    this.token_id = 0;
-
-    this.setApproveLabel = (label) => {};
-    this.hideApproveButton = (visible) => {};
-    this.showWrapButton = (visible) => {};
-  }
-
-  action() {
-
-    this.pending(true);
-
-    const approvalEvent = this;
-
-    context.createSubscriber(
-
-      "pendingTransactions",
-      this.resource_id,
-      (payload) => { approvalEvent.process(payload); }
-    );
-  }
-
-  process(payload) {
-
-    if (this.resource_id == 0)
-      return;
-
-    const [ event_id, owner, approved, tokenId ] = payload;
-
-    if (event_id != "approval" && tokenId != this.tokenId) {
-
-      const approvalEvent = this;
-
-      context.createSubscriber(
-
-        "pendingTransactions",
-	this.resource_id,
-	(payload) => { approvalEvent.process(payload); }
-      );
-
-      return;
-    }
-
-    this.cancel();
-
-    this.hideApproveButton();
-    this.showWrapButton();
-  }
-
-  cancel() {
-
-    this.resource_id = 0;
-    this.pending(false);
-  }
-
-  pending(isPending) {
-
-    if (isPending)
-      this.setApproveLabel("Pending");
-    else
-      this.setApproveLabel("Approve");
-  }
+  return (
+    <ApproveButton>{ label }</ApproveButton>
+  );
 }
 
 function WrapDialog(props) {
