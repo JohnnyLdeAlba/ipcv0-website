@@ -4,6 +4,50 @@ import wrapperABI from "./ipc-wrapper-abi.json";
 import { ethers } from "ethers";
 import { t_subscriptions } from "./subscriptions"
 
+function approvalEvent(ipc_contract) {
+
+  return (owner, approved, tokenId) => {
+
+    ipc_contract.processSubscription(
+      "pendingTransactions",
+      [ "approval", owner, approved, tokenId ]
+    );
+  }
+}
+
+function approvalForAllEvent(ipc_contract) {
+
+  return (owner, operator, approved) => {
+
+    ipc_contract.processSubscription(
+      "pendingTransactions",
+      [ "approvalForAll", owner, operator, approved ]
+    );
+  }
+}
+
+function wrappedEvent(ipc_contract) {
+
+  return (tokenIndex, tokenId, owner) => {
+
+    ipc_contract.processSubscription(
+      "pendingTransactions",
+      [ "wrapped", tokenIndex, tokenId, owner ]
+    );
+  }
+}
+
+function unwrappedEvent(ipc_contract) {
+
+  return (tokenIndex, tokenId, owner) => {
+
+    ipc_contract.processSubscription(
+      "pendingTransactions",
+      [ "unwrapped", tokenIndex, tokenId, owner ]
+    );
+  }
+}
+
 class t_ipc_contract extends t_subscriptions {
 
   sourceAddress;
@@ -41,7 +85,8 @@ class t_ipc_contract extends t_subscriptions {
 
   connect() {
 
-    this.createEvent("pending");
+    this.createEvent("pendingTransactions");
+    this.createEvent("cancelTransactions");
 
     const web3_provider = this.mwc_provider.getWeb3Provider();
     const provider = new ethers.providers.Web3Provider(web3_provider);
@@ -53,11 +98,11 @@ class t_ipc_contract extends t_subscriptions {
     const wrapperContract = new ethers.Contract(
       this.wrapperAddress, wrapperABI, signer);
 
-    sourceContract.on("ApprovalForAll", () => {});
-    sourceContract.on("Approval", () => {});
+    sourceContract.on("ApprovalForAll", approvalForAllEvent(this));
+    sourceContract.on("Approval", approvalEvent(this));
 
-    wrapperContract.on("Wrapped", (tokenIndex, tokenId, ownerAddress) => {});
-    wrapperContract.on("Unwrapped", (tokenIndex, tokenId, ownerAddress) => {});
+    wrapperContract.on("Wrapped", wrappedEvent(this));
+    wrapperContract.on("Unwrapped", unwrappedEvent(this));
 
     this.provider = provider;
     this.sourceContract = sourceContract;
@@ -71,19 +116,22 @@ class t_ipc_contract extends t_subscriptions {
     this.wrapperContract = null;
   }
 
-  async setApprovalForAll(tokenId) {
+  // need to listen for approveal for all mode set to update all buttons.
+  // approve changes from pending to wrap
+  // wrap hides and moves ipc to the back. (resort)
+  // needs to open a window witrh transaction id.
 
-    console.log(this.provider);
+  async setApprovalForAll(tokenId) {
 
     if (this.provider == null)
       return false;
     
     const signer = this.provider.getSigner();
 
-    let message = await this.sourceContract
+    let message = await this.wrapperContract
       .approve(this.wrapperAddress, tokenId)
         .catch((error) => {
-          console.log(error);
+
         });
 
     return true;

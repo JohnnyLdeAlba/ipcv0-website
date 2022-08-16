@@ -80,7 +80,7 @@ function Table(props) {
 
 function Row(props) {
 
-  const Caption = styled(Box)({
+  const Row = styled(Box)({
 
     cursor: "pointer",
     display: "flex",
@@ -92,9 +92,9 @@ function Row(props) {
   });
 
   return (
-    <Caption className={ props.className }>
+    <Row className={ props.className }>
       { props.children }
-    </Caption>
+    </Row>
   );
 }
 
@@ -317,6 +317,8 @@ function WrapRow(props) {
     fontSize: "12px"
   });
 
+  const buttonLabel = "Pending";
+
   return (
     <Row>
       <Avatar><Image src={ "gif/" + ipc.token_id + ".gif" }/></Avatar>
@@ -329,10 +331,85 @@ function WrapRow(props) {
       </RowSpan>
       <Action>
         <SmButton variant="contained">View</SmButton>
-        <SmButton variant="contained">Approve</SmButton>
+        <SmButton variant="contained">{ buttonLabel }</SmButton>
       </Action>
     </Row>
   );
+}
+
+class t_approval_event {
+
+  resource_id;
+  tokenId;
+
+  setApproveLabel;
+  hideApproveButton;
+  showWrapButton;
+
+  constructor() {
+
+    this.resource_id = 0;
+    this.token_id = 0;
+
+    this.setApproveLabel = (label) => {};
+    this.hideApproveButton = (visible) => {};
+    this.showWrapButton = (visible) => {};
+  }
+
+  action() {
+
+    this.pending(true);
+
+    const approvalEvent = this;
+
+    context.createSubscriber(
+
+      "pendingTransactions",
+      this.resource_id,
+      (payload) => { approvalEvent.process(payload); }
+    );
+  }
+
+  process(payload) {
+
+    if (this.resource_id == 0)
+      return;
+
+    const [ event_id, owner, approved, tokenId ] = payload;
+
+    if (event_id != "approval" && tokenId != this.tokenId) {
+
+      const approvalEvent = this;
+
+      context.createSubscriber(
+
+        "pendingTransactions",
+	this.resource_id,
+	(payload) => { approvalEvent.process(payload); }
+      );
+
+      return;
+    }
+
+    this.cancel();
+
+    this.hideApproveButton();
+    this.showWrapButton();
+  }
+
+  cancel() {
+
+    this.resource_id = 0;
+    this.pending(false);
+  }
+
+  pending(isPending) {
+
+    if (isPending)
+      this.setApproveLabel("Pending");
+    else
+      this.setApproveLabel("Approve");
+  }
 }
 
 function WrapDialog(props) {
@@ -385,8 +462,6 @@ function WrapDialog(props) {
 	  </Caption>
           <Action>&nbsp;</Action>
 	</CaptionRow>
-
-        <Button onClick={ onClick }>test</Button>
 
   	<WrapRow ipc={ ipc } />
 
