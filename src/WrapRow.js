@@ -255,7 +255,7 @@ function Gender(props) {
     </Gender>);
 }
 
-function approveEvent(ipc, update, setUpdate) {
+function approvalEvent(ipc, update, setUpdate) {
 
   return async () => {
 
@@ -270,13 +270,13 @@ function approveEvent(ipc, update, setUpdate) {
     const resourceId = "approval" + ipc.token_id;
 
     context.addSubscriber(
-      "pendingTransactions",
+      "approval",
       resourceId,
       (payload) => {
 
         const [ eventId, owner, approved, tokenId ] = payload;
 
-        if (eventId != "approval" &&
+        if (eventId != "approval" ||
           tokenId != ipc.token_id)
             return;
 
@@ -287,7 +287,7 @@ function approveEvent(ipc, update, setUpdate) {
 	setUpdate(++update);
 
 	context.removeSubscriber(
-          "pendingTransactions",
+          "approval",
           resourceId
         );
       } 
@@ -310,24 +310,23 @@ function wrappedEvent(ipc, update, setUpdate) {
     const resourceId = "wrapped" + ipc.token_id;
 
     context.addSubscriber(
-      "pendingTransactions",
+      "wrapped",
       resourceId,
       (payload) => {
 
         const [ eventId, tokenIndex, tokenId, owner ] = payload;
 
-        if (eventId != "wrapped" &&
+        if (eventId != "wrapped" ||
           tokenId != ipc.token_id)
             return;
 
         ipc.wrapped = true;
-        ipc.approved = false;
         ipc.pending = false;
 
 	setUpdate(++update);
 
 	context.removeSubscriber(
-          "pendingTransactions",
+          "wrapped",
           resourceId
         );
       } 
@@ -350,13 +349,13 @@ function unwrappedEvent(ipc, update, setUpdate) {
     const resourceId = "unwrapped" + ipc.token_id;
 
     context.addSubscriber(
-      "pendingTransactions",
+      "unwrapped",
       resourceId,
       (payload) => {
 
         const [ eventId, tokenIndex, tokenId, owner ] = payload;
 
-        if (eventId != "wrapped" &&
+        if (eventId != "unwrapped" ||
           tokenId != ipc.token_id)
             return;
 
@@ -366,7 +365,7 @@ function unwrappedEvent(ipc, update, setUpdate) {
 	setUpdate(++update);
 
 	context.removeSubscriber(
-          "pendingTransactions",
+          "unwrapped",
           resourceId
         );
       } 
@@ -411,8 +410,11 @@ export function WrapCaption(props) {
 
 export function WrapRow(props) {
 
-  const ipc = props.ipc;
   const [ update, setUpdate ] = React.useState(0);
+
+  const ipc = props.ipc ? props.ipc : null;
+  if (props.ipc == null)
+    return (<></>);
 
   const Image = styled("img")({
 
@@ -439,7 +441,7 @@ export function WrapRow(props) {
         <PendingButton
 	  show={ !ipc.wrapped && !ipc.approved }
 	  pending={ ipc.pending }
-	  onClick={ approveEvent(ipc, update, setUpdate) }>
+	  onClick={ approvalEvent(ipc, update, setUpdate) }>
 	    Approve
 	</PendingButton>
 

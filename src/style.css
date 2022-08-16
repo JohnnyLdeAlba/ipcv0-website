@@ -56,3 +56,5 @@
   font-style: italic;
   src: url('./Poppins/Poppins-LightItalic.ttf');
 }
+
+html, body { max-height: 100vh }

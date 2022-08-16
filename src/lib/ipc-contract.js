@@ -9,7 +9,7 @@ function approvalEvent(ipc_contract) {
   return (owner, approved, tokenId) => {
 
     ipc_contract.processSubscription(
-      "pendingTransactions",
+      "approval",
       [ "approval", owner, approved, tokenId ]
     );
   }
@@ -20,7 +20,7 @@ function approvalForAllEvent(ipc_contract) {
   return (owner, operator, approved) => {
 
     ipc_contract.processSubscription(
-      "pendingTransactions",
+      "approvalForAll",
       [ "approvalForAll", owner, operator, approved ]
     );
   }
@@ -31,7 +31,7 @@ function wrappedEvent(ipc_contract) {
   return (tokenIndex, tokenId, owner) => {
 
     ipc_contract.processSubscription(
-      "pendingTransactions",
+      "wrapped",
       [ "wrapped", tokenIndex, tokenId, owner ]
     );
   }
@@ -42,7 +42,7 @@ function unwrappedEvent(ipc_contract) {
   return (tokenIndex, tokenId, owner) => {
 
     ipc_contract.processSubscription(
-      "pendingTransactions",
+      "unwraped",
       [ "unwrapped", tokenIndex, tokenId, owner ]
     );
   }
@@ -91,17 +91,20 @@ class t_ipc_contract extends t_subscriptions {
     this.mwc_provider.addSubscriber("disconnect", "ipcContract",
       () => { this.disconnect(); });
 
-    this.createSubscription("pendingTransactions");
+    this.createSubscription("approval");
+    this.createSubscription("approvalForAll");
+    this.createSubscription("wrapped");
+    this.createSubscription("unwrapped");
 
     const ipc_contract = this;
 
     setInterval(() => {
       ipc_contract.processSubscription(
-        "pendingTransactions", [ "approval", 0, true, 944 ]);
+        "approval", [ "approval", 0, true, 937 ]);
       ipc_contract.processSubscription(
-        "pendingTransactions", [ "wrapped", 0, 944, 0 ]);
+        "wrapped", [ "wrapped", 0, 937, 0 ]);
       ipc_contract.processSubscription(
-        "pendingTransactions", [ "unwrapped", 0, 944, 0 ]);
+        "unwrapped", [ "unwrapped", 0, 937, 0 ]);
 
       console.log("pending event");
     }, 5000);
@@ -135,6 +138,42 @@ class t_ipc_contract extends t_subscriptions {
     this.provider = null;
     this.sourceContract = null;
     this.wrapperContract = null;
+  }
+
+  async wBalanceOf(owner) {
+
+    if (this.defaultProvider == null)
+      return null;
+
+    const wrapperContract = new ethers.Contract(
+      this.wrapperAddress, wrapperABI, this.defaultProvider);
+
+    const balance = await wrapperContract
+      .balanceOf(owner)
+        .catch(error => null);
+
+    if (balance == null)
+      return null;
+
+    return balance;
+  }
+
+  async uwBalanceOf(owner) {
+
+    if (this.defaultProvider == null)
+      return null;
+
+    const wrapperContract = new ethers.Contract(
+      this.wrapperAddress, wrapperABI, this.defaultProvider);
+
+    const balance = await wrapperContract
+      .uwBalanceOf(owner)
+        .catch(error => null);
+
+    if (balance == null)
+      return null;
+
+    return balance;
   }
 
   async wGetOwnersTokenIdList(owner, startIndex, total) {
