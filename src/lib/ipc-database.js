@@ -41,6 +41,9 @@ class t_ipc_database extends t_subscriptions {
 
   async getUnwrappedList(owner, approved) {
 
+    if (owner == null)
+      return null;
+
     approved = approved ? true : false;
 
     const balance = await this.ipc_contract.uwBalanceOf(owner);
@@ -68,6 +71,9 @@ class t_ipc_database extends t_subscriptions {
   }
 
   async getWrappedList(owner, approved) {
+
+    if (owner == null)
+      return null;
 
     approved = approved ? true : false;
 
@@ -97,6 +103,9 @@ class t_ipc_database extends t_subscriptions {
   }
 
   async loadOwnersTokens(owner, approved, type, sort) {
+
+    if (owner == null)
+      return null;
 
     type = (typeof type == "undefined" || type == "wrapped") ? "wrapped" : "unwrapped";
     sort = (typeof sort == "undefined" || sort == "desc") ? "desc" : "asc";

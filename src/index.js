@@ -93,7 +93,7 @@ function WrapDialog(props) {
     if (ipc_database.ownersTokens == null) {
 
       await ipc_database.loadOwnersTokens(
-        "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
+        context.mwc_provider.getAccountDetails().account,
         false,
 	"wrapped"
       );
