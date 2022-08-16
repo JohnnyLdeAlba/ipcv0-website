@@ -2,7 +2,7 @@ import sourceABI from "./ipc-contract-abi.json";
 import wrapperABI from "./ipc-wrapper-abi.json";
 
 import { ethers } from "ethers";
-import { t_subscriptions } from "./subscriptions";
+import { t_subscriptions } from "./subscriptions"
 
 function approvalEvent(ipc_contract) {
 
@@ -53,10 +53,8 @@ class t_ipc_contract extends t_subscriptions {
   sourceAddress;
   wrapperAddress;
 
-  providerURI;
   mwc_provider;
   provider;
-  defaultProvider;
 
   sourceContract;
   wrapperContract;
@@ -68,21 +66,14 @@ class t_ipc_contract extends t_subscriptions {
     this.sourceAddress = "0x4787993750B897fBA6aAd9e7328FC4F5C126e17c";
     this.wrapperAddress = "0xD0f54E91ee2e57EA72B0836565E8dfFDb0a5F950";
 
-    this.providerURI = null;
     this.mwc_provider = null;
     this.provider = null;
-    this.defaultProvider = null;
 
     this.sourceContract = null;
     this.wrappereContract = null;
   }
 
   initialize() {
-
-    this.defaultProvider = ethers.getDefaultProvider(
-      "homestead",
-      { alchemy: this.providerURI }
-    );
 
     this.mwc_provider.addSubscriber("connect", "ipcContract",
       () => { this.connect(); });
@@ -94,7 +85,6 @@ class t_ipc_contract extends t_subscriptions {
     this.createSubscription("pendingTransactions");
 
     const ipc_contract = this;
-
     setInterval(() => {
       ipc_contract.processSubscription(
         "pendingTransactions", [ "approval", 0, true, 944 ]);
@@ -137,16 +127,13 @@ class t_ipc_contract extends t_subscriptions {
     this.wrapperContract = null;
   }
 
-  async wGetOwnersTokenIdList(owner, startIndex, total) {
+  async getWOwnersTokenIdList(owner, startIndex, total) {
 
-    if (this.defaultProvider == null)
+    if (this.provider == null)
       return null;
 
-    const wrapperContract = new ethers.Contract(
-      this.wrapperAddress, wrapperABI, this.defaultProvider);
-
-    const ownersTokens = await wrapperContract
-      .getTokensOfOwner(owner, startIndex, total)
+    const ownersTokens = await this.wrapperContract
+      .approve(this.wrapperAddress, tokenId)
         .catch(error => null);
 
     if (ownersTokens == null)
@@ -156,48 +143,6 @@ class t_ipc_contract extends t_subscriptions {
       (ipc) => { return parseInt(ipc.tokenId._hex, 16) });
 
     return ownersTokenIdList;
-  }
-
-  async uwGetOwnersTokenIdList(owner, startIndex, total) {
-
-    if (this.defaultProvider == null)
-      return null;
-
-    const wrapperContract = new ethers.Contract(
-      this.wrapperAddress, wrapperABI, this.defaultProvider);
-
-    const ownersTokens = await wrapperContract
-      .uwGetTokensOfOwner(owner, startIndex, total)
-        .catch(error => null);
-
-    if (ownersTokens == null)
-      return null;
-
-    const ownersTokenIdList = ownersTokens.map(
-      (ipc) => { return parseInt(ipc.tokenId._hex, 16) });
-
-    return ownersTokenIdList;
-  }
-
-  async getLastIpc() {
-
-    if (this.defaultProvider == null)
-      return null;
-
-    const wrapperContract = new ethers.Contract(
-      this.wrapperAddress, wrapperABI, this.defaultProvider);
-
-    const total = await wrapperContract.totalSupply()
-      .catch(error => 0);
-
-    if (total == 0)
-      return null;
-
-    const ipc = await wrapperContract.getIpc(total)
-      .catch(error => null);
-    if (ipc == null) return null;
-
-    return ipc;
   }
 
   // need to listen for approveal for all mode set to update all buttons.
