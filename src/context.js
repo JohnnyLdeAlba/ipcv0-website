@@ -1,6 +1,7 @@
 import { t_subscriptions } from "./lib/subscriptions";
 import { createMWCProvider } from "./lib/MultiWalletConnect/MWCProvider";
 import { createIPCContract } from "./lib/ipc-contract";
+import { createIPCDatabase } from "./lib/ipc-database";
 import { IPCLib } from "./lib/ipc-lib";
 
 import { getConfig } from "./config";
@@ -24,12 +25,12 @@ export class t_context extends t_subscriptions {
 
   mwc_provider;
   ipc_contract;
-  database;
+  ipc_database;
 
   constructor() {
-    super();
 
-    this.database = null;
+    super();
+    this.ipc_database = null;
   }
 
   async initialize() {
@@ -57,8 +58,10 @@ export class t_context extends t_subscriptions {
     this.mwc_provider.setProviderURI(config.providerURI);
     this.ipc_contract.initialize();
 
+    this.ipc_database = createIPCDatabase(this);
+
     await this.autoConnect();
-    await this.loadDatabase();
+    await this.ipc_database.loadDatabase();
   }
 
   getConfig() { return getConfig(); }
@@ -83,21 +86,6 @@ export class t_context extends t_subscriptions {
     this.getSession();
     this.mwc_provider.autoConnect(this.session);
   }
-
-  async loadDatabase() {
-
-    const json_database = await fetch("database.json", { cache: "force-cache" })
-      .then(response => response.json());
-
-    const database = [];
-
-    for (let index = 0; index < json_database.length; index++)
-      database[index] = IPCLib.ipc_create_label_ipc(json_database[index]);
-
-    this.database = database;
-  }
-
-  getDatabase() { return this.database; }
 }
 
 const context = new t_context();

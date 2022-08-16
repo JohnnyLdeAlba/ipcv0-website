@@ -79,83 +79,29 @@ function Table(props) {
   return (<Table>{ props.children }</Table>);
 }
 
-async function getUnwrappedList(owner, approved) {
-
-  owner = "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D";
-  approved = approved ? true : false;
-
-  const ipc_contract = context.ipc_contract;
-
-  const balance = await ipc_contract.uwBalanceOf(owner);
-  if (balance == 0)
-    return null;
-
-  // Need to make this a config var
-  if (balance > 100)
-    balance = 100;
-
-  const tokenList = []
-
-  const tokenIdList = await ipc_contract
-    .uwGetOwnersTokenIdList(owner, 0, balance);
-
-  for (let index = 0; index < tokenIdList.length; index++) {
-
-    const token = context.database[tokenIdList[index] + 1];
-
-    token.approved = approved;
-    tokenList.push(token);
-  }
-
-  tokenList.sort((a, b) => { return a.token_id - b.token_id });
-  return [ tokenList, balance ];
-}
-
-async function getWrappedList(owner, approved) {
-
-  owner = "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D";
-  approved = approved ? true : false;
-
-  const ipc_contract = context.ipc_contract;
-
-  const balance = await ipc_contract.wBalanceOf(owner);
-  if (balance == 0)
-    return null;
-
-  // Need to make this a config var
-  if (balance > 100)
-    balance = 100;
-
-  const tokenList = []
-
-  const tokenIdList = await ipc_contract
-    .wGetOwnersTokenIdList(owner, 0, balance);
-
-  for (let index = 0; index < tokenIdList.length; index++) {
-
-    const token = context.database[tokenIdList[index] + 1];
-
-    token.approved = approved;
-    token.wrapped = true;
-    tokenList.push(token);
-  }
-
-  tokenList.sort((a, b) => { return a.token_id - b.token_id });
-  return [ tokenList, balance ];
-}
-
-let ipcList = [];
 
 function WrapDialog(props) {
 
+  const ipc_database = context.ipc_database;
+
   const [ update, setUpdate ] = React.useState(0);
+
+  const ownersTokens = ipc_database.getOwnersTokens(1, 100);
 
   React.useEffect(async () => {
 
-    if (ipcList.length == 0) {
+    if (ipc_database.ownersTokens == null) {
 
-      [ ipcList,] = await getWrappedList(null, true);
+      await ipc_database.loadOwnersTokens(
+        "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
+        false,
+	"wraped"
+      );
+
       setUpdate(update + 1);
+
+      // add events here...reconnect, sessionupdate, disconnect
+      // must trigger panel update...
     }
 
   });
@@ -172,7 +118,7 @@ function WrapDialog(props) {
       <Table>
 
         <WrapCaption />
-	{ ipcList.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) }
+	{ ownersTokens ? ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) : <></> }
 
         <Box sx={{ padding: "12px 16px 8px 16px" }}>
           <Box sx={{ fontSize: "14px", textAlign: "right" }}>1 of 1 &nbsp; &lt; &nbsp; &gt;</Box>
