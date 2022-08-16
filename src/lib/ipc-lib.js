@@ -670,6 +670,10 @@ function _calculate_colors(dna_bytes)
 
 function t_label_ipc()
 {
+    this.pending = false;
+    this.approved = false;
+    this.wrapped = false;
+
     this.id = 0;
     this.token_id = 0;
     this.name = "";
@@ -727,6 +731,10 @@ function t_label_ipc()
     
 function t_ipc()
 {
+    this.pending = false;
+    this.approved = false;
+    this.wrapped = false;
+
     this.id = 0;
     this.token_id = 0;
     this.name = "";
@@ -958,7 +966,11 @@ function ipc_create_label_ipc(ipc, IPCLang)
     IPCLang = IPCLang ? IPCLang : IPCEnglish;
 
     let label_ipc = new t_label_ipc();
-    
+
+    label_ipc.pending = ipc.pending;
+    label_ipc.approved = ipc.approved;
+    label_ipc.wrapped = ipc.wrapped;
+
     label_ipc.token_id = ipc.token_id;
     label_ipc.name = ipc.name;
     label_ipc.meta.sprite = ipc.meta.sprite;

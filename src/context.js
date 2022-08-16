@@ -42,7 +42,7 @@ export class t_context extends t_subscriptions {
 
     this.ipc_contract = createIPCContract();
     this.ipc_contract.mwc_provider = this.mwc_provider;
-    this.mwc_provider.subscriptions = this.subscriptions;
+    this.ipc_contract.subscriptions = this.subscriptions;
 
     this.createSubscription("connect");
     this.createSubscription("disconnect");

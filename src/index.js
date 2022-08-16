@@ -300,15 +300,90 @@ function Gender(props) {
     </Gender>);
 }
 
+function approveEvent(ipc, update, setUpdate) {
+
+  return async () => {
+
+    if (ipc.pending == true)
+      return;
+
+    // open dialog
+
+    ipc.pending = true;
+    setUpdate(++update);
+
+    const resourceId = "approval" + ipc.token_id;
+
+    context.addSubscriber(
+      "pendingTransactions",
+      resourceId,
+      (payload) => {
+
+        const [ eventId, owner, approved, tokenId ] = payload;
+
+        if (eventId != "approval" &&
+          tokenId != ipc.token_id)
+            return;
+
+        if (approved)
+          ipc.approved = true;
+
+        ipc.pending = false;
+	setUpdate(++update);
+
+	context.removeSubscriber(
+          "pendingTransactions",
+          resourceId
+        );
+      } 
+    );
+  };
+}
+
+function wrappedEvent(ipc, update, setUpdate) {
+
+  return async () => {
+
+    if (ipc.pending == true)
+      return;
+
+    // open dialog
+
+    ipc.pending = true;
+    setUpdate(++update);
+
+    const resourceId = "wrapped" + ipc.token_id;
+
+    context.addSubscriber(
+      "pendingTransactions",
+      resourceId,
+      (payload) => {
+
+        const [ eventId, tokenIndex, tokenId, owner ] = payload;
+
+        if (eventId != "wrapped" &&
+          tokenId != ipc.token_id)
+            return;
+
+        ipc.wrapped = true;
+        ipc.approved = false;
+        ipc.pending = false;
+
+	setUpdate(++update);
+
+	context.removeSubscriber(
+          "pendingTransactions",
+          resourceId
+        );
+      } 
+    );
+  };
+}
+
 function WrapRow(props) {
 
   const ipc = props.ipc;
-
-  const [ approvePending, setApprovePending ] = React.useState(false);
-  const [ approveVisible, showApproveButton ] = React.useState(true);
-
-  const [ wrapPending, setWrapPending ] = React.useState(false);
-  const [ wrapVisible, showWrapButton ] = React.useState(false);
+  const [ update, setUpdate ] = React.useState(0);
 
   const Image = styled("img")({
 
@@ -317,17 +392,9 @@ function WrapRow(props) {
     imageRendering: "pixelated"
   });
 
-  const SmButton = styled(Button)({
-
-    margin: "8px 16px 8px 0",
-    fontSize: "12px"
-  });
-
-  const approveLabel = approvePending ? "Pending" : "Approve";
-  const wrapLabel = wrapPending ? "Pending" : "Wrap";
-
   return (
     <Row>
+
       <Avatar><Image src={ "gif/" + ipc.token_id + ".gif" }/></Avatar>
       <RowSpan>
         <RowItem label="Name">#{ ipc.token_id }</RowItem>
@@ -337,27 +404,95 @@ function WrapRow(props) {
         <Handedness label="Handed">{ ipc.handedness }</Handedness>
       </RowSpan>
       <Action>
-        <SmButton variant="contained">View</SmButton>
-        <SmButton variant="contained"></SmButton>
+
+        <PendingButton>View</PendingButton>
+
+        <PendingButton
+	  show={ !ipc.wrapped && !ipc.approved }
+	  pending={ ipc.pending }
+	  onClick={ approveEvent(ipc, update, setUpdate) }>
+	    Approve
+	</PendingButton>
+
+        <PendingButton
+	  show={ !ipc.wrapped && ipc.approved }
+	  pending={ ipc.pending }
+	  onClick={ wrappedEvent(ipc, update, setUpdate) }>
+	    Wrap
+	</PendingButton>
+
+        <PendingButton
+	  show={ ipc.wrapped }
+	  pending={ ipc.pending }
+	  onClick={ unwrappedEvent(ipc, update, setUpdate) }>
+	    Uwrap
+	</PendingButton>
+
       </Action>
     </Row>
   );
 }
 
-function ApproveButton(props) {
+function unwrappedEvent(ipc, update, setUpdate) {
 
-  const [ visible, show ] = React.useState(true);
-  const [ pending, setPending ] = React.useState(false);
+  return async () => {
 
-  const display = visible ? "inline-flex" : "none"; 
-  const label = pending ? "Pending" : "Approve";
+    if (ipc.pending == true)
+      return;
 
-  const ApproveButton = styled(Button)({
-    display: display
+    // open dialog
+
+    ipc.pending = true;
+    setUpdate(++update);
+
+    const resourceId = "unwrapped" + ipc.token_id;
+
+    context.addSubscriber(
+      "pendingTransactions",
+      resourceId,
+      (payload) => {
+
+        const [ eventId, tokenIndex, tokenId, owner ] = payload;
+
+        if (eventId != "wrapped" &&
+          tokenId != ipc.token_id)
+            return;
+
+        ipc.wrapped = false;
+        ipc.pending = false;
+
+	setUpdate(++update);
+
+	context.removeSubscriber(
+          "pendingTransactions",
+          resourceId
+        );
+      } 
+    );
+  };
+}
+
+function PendingButton(props) {
+
+  const display = (typeof props.show == "undefined" ||
+    props.show == true) ? "inline-flex" : "none"; 
+
+  const label = props.pending ? "Pending" : props.children;
+
+  const PendingButton = styled(Button)({
+
+    display: display,
+    margin: "8px 16px 8px 0",
+    fontSize: "12px"
   });
 
   return (
-    <ApproveButton>{ label }</ApproveButton>
+    <PendingButton
+      variant="contained"
+      className={ props.className }
+      onClick={ props.onClick }>
+        { label }
+    </PendingButton>
   );
 }
 

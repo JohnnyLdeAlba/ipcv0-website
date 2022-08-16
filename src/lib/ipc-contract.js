@@ -81,12 +81,23 @@ class t_ipc_contract extends t_subscriptions {
       () => { this.connect(); });
     this.mwc_provider.addSubscriber("disconnect", "ipcContract",
       () => { this.disconnect(); });
+
+    this.createSubscription("pendingTransactions");
+
+    const ipc_contract = this;
+    setInterval(() => {
+      ipc_contract.processSubscription(
+        "pendingTransactions", [ "approval", 0, true, 944 ]);
+      ipc_contract.processSubscription(
+        "pendingTransactions", [ "wrapped", 0, 944, 0 ]);
+      ipc_contract.processSubscription(
+        "pendingTransactions", [ "unwrapped", 0, 944, 0 ]);
+
+      console.log("pending event");
+    }, 5000);
   }
 
   connect() {
-
-    this.createEvent("pendingTransactions");
-    this.createEvent("cancelTransactions");
 
     const web3_provider = this.mwc_provider.getWeb3Provider();
     const provider = new ethers.providers.Web3Provider(web3_provider);
