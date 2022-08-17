@@ -86,17 +86,19 @@ function WrapDialog(props) {
 
   const [ update, setUpdate ] = React.useState(0);
 
-  const ownersTokens = ipc_database.getOwnersTokens(0, 100);
+  // const ownersTokens = ipc_database.getOwnersTokens(0, 100);
+  const ownersTokens = [];
 
   React.useEffect(async () => {
 
     if (ipc_database.ownersTokens == null) {
 
-      await ipc_database.loadOwnersTokens(
-        context.mwc_provider.getAccountDetails().account,
-        false,
-	"wrapped"
+      await ipc_database.requestOwnersTokens(
+        "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",  //context.mwc_provider.getAccountDetails().account,
+        1,
+	1
       );
+
 
       setUpdate(update + 1);
 
