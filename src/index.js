@@ -80,33 +80,95 @@ function Table(props) {
 }
 
 
+function WrapEffect(payload) {
+
+  const [
+    wrapped,
+    sortBy,
+    orderBy,
+    rowsPerPage,
+    page,
+    show,
+    setWrapped,
+    setRowsPerPage,
+    setPage
+  ] = payload
+
+  const ipc_database = context.ipc_database;
+
+  return async () => {
+
+  if (ipc_database.ownersTokens == null) {
+
+    await ipc_database.requestOwnersTokens(
+      "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",  // context.mwc_provider.getAccountDetails().account,
+      page * rowsPerPage,
+      wrapped,
+      true
+    );
+    
+    show(true);
+    setWrapped(wrapped);
+    setRowsPerPage(rowsPerPage);
+    setPage(page);
+  }
+
+  context.addSubscriber("updateWrapPanel", "wrapPanel", async (payload) => {
+
+    const [
+      visible,
+      wrapped,
+      rowsPerPage,
+      page
+    ] = payload;
+
+    if (visible != null) show(visible);
+    if (wrapped != null) setWrapped(wrapped);
+
+    setRowsPerPage(rowsPerPage);
+    setPage(page);
+
+    await ipc_database.requestOwnersTokens(
+      "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
+      page * rowsPerPage,
+      wrapped,
+      true
+    );
+
+  });
+
+  return () => {
+    context.aremoveSubscriber("updateWrapPanel", "wrapPanel");
+  }
+
+  }
+}
+
 function WrapDialog(props) {
 
   const ipc_database = context.ipc_database;
 
-  const [ update, setUpdate ] = React.useState(0);
+  const [ visible, show ] = React.useState(false);
+  const [ wrapped, setWrapped ] = React.useState(true);
+  const [ sortBy, setSortBy ] = React.useState("tokenId");
+  const [ orderBy, setOrderBy ] = React.useState("asc");
+  const [ rowsPerPage, setRowsPerPage ] = React.useState(4);
+  const [ page, setPage ] = React.useState(0);
 
-  const ownersTokens = ipc_database.getOwnersTokens(0, 100);
+  React.useEffect(WrapEffect([
+    wrapped,
+    sortBy,
+    orderBy,
+    rowsPerPage,
+    page,
+    show,
+    setWrapped,
+    setRowsPerPage,
+    setPage
+  ]));
 
-  React.useEffect(async () => {
-
-    if (ipc_database.ownersTokens == null) {
-
-      await ipc_database.requestOwnersTokens(
-        "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",  //context.mwc_provider.getAccountDetails().account,
-        100,
-	true
-      );
-
-
-      setUpdate(update + 1);
-
-      // chosing wrap should update database list.
-      // add events here...reconnect, sessionupdate, disconnect
-      // must trigger panel update...
-    }
-
-  });
+  const ownersTokens = ipc_database.getOwnersTokens(
+    page, rowsPerPage);
 
   return (
 
@@ -119,7 +181,10 @@ function WrapDialog(props) {
     >
       <Table>
 
+	
         <WrapCaption />
+	<Button onClick={ () => { setPage(page - 1);  }  }>Prev</Button>
+	<Button onClick={ () => { setPage(page + 1);  }  }>Next</Button>
 	{ ownersTokens ? ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) : <></> }
 
         <Box sx={{ padding: "12px 16px 8px 16px" }}>

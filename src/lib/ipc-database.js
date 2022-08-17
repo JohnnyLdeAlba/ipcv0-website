@@ -10,6 +10,7 @@ class t_ipc_database extends t_subscriptions {
   ipc_contract;
   database;
 
+  wrapped;
   ownersBalance;
   ownersTokens;
 
@@ -29,8 +30,10 @@ class t_ipc_database extends t_subscriptions {
 
     this.database = null;
 
+    this.wrapped = false;
     this.ownersBalance = -1;
     this.ownersTokens = null;
+
     this.segment = -1;
     this.segmentSize = config.loadSegmentSize;
   }
@@ -152,7 +155,7 @@ class t_ipc_database extends t_subscriptions {
     return 0;
   }
 
-  clearOwnersTokens() {
+  resetOwnersTokens() {
 
     this.ownersTokens = null;
     this.ownersBalance = -1;
@@ -164,6 +167,20 @@ class t_ipc_database extends t_subscriptions {
   }
 
   async requestOwnersTokens(owner, requestedTotalTokens, wrapped, approved) {
+
+    wrapped = typeof wrapped == "undefined" ||
+      wrapped == false ? false : true;
+
+    approved = typeof approved == "undefined" ||
+      approved == false ? false : true;
+
+    if (this.owner != owner)
+      this.resetOwnersTokens();
+
+    if (this.wrapped != wrapped)
+      this.resetOwnersTokens();
+
+/*  finish here.... */
 
     let segmentTotalTokens = 0;
 
@@ -180,12 +197,6 @@ class t_ipc_database extends t_subscriptions {
       else if (requestedTotalTokens <= segmentTotalTokens)
         return -1;
     }
-
-    wrapped = typeof wrapped == "undefined" ||
-      wrapped == false ? false : true;
-
-    approved = typeof approved == "undefined" ||
-      approved == false ? false : true;
 
     let responce_id = 0;
     while (segmentTotalTokens < requestedTotalTokens) {
