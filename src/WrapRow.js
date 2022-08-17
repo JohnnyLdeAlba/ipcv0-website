@@ -359,6 +359,7 @@ function unwrappedEvent(ipc, update, setUpdate) {
           tokenId != ipc.token_id)
             return;
 
+        ipc.approved = true;
         ipc.wrapped = false;
         ipc.pending = false;
 

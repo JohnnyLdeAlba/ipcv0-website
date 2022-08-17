@@ -6,7 +6,7 @@ class t_config {
   constructor() {
 
     this.providerURI = "https://eth-mainnet.g.alchemy.com/v2/SYJS-Zaeo1W7JJNFsV8-ZeUJigU5VyNk";
-    this.maxOwnerTotal = 200;
+    this.loadSegmentSize = 50;
   }
 };
 

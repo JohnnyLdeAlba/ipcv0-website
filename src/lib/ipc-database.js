@@ -32,7 +32,7 @@ class t_ipc_database extends t_subscriptions {
     this.ownersBalance = -1;
     this.ownersTokens = null;
     this.segment = -1;
-    this.segmentSize = 1;
+    this.segmentSize = config.loadSegmentSize;
   }
 
   async loadDatabase() {
@@ -100,6 +100,57 @@ class t_ipc_database extends t_subscriptions {
     return 0;
   }
 
+  async getOwnersWrappedTokens(owner, approved) {
+
+    if (this.ownersBalance == 0)
+      return -1;
+    
+    if (owner == null)
+      return -1;
+
+    approved = typeof approved == "undefined" ||
+      approved == true ? true : false;
+
+    if (this.ownersBalance == -1) {
+
+      const balance = await this.ipc_contract.wBalanceOf(owner);
+      if (balance == 0)
+        return -1;
+ 
+      this.ownersBalance = balance;
+    }
+
+    const segmentTotalTokens = this.segmentTotalTokens();
+    if (segmentTotalTokens >= this.ownersBalance)
+      return -1;
+
+    this.segment++;
+
+    const tokenIdList = await this.ipc_contract
+      .wGetOwnersTokenIdList(
+        owner,
+	this.segment,
+	this.segmentSize
+    );
+
+    if (tokenIdList == null)
+      return -1;
+
+    if (this.ownersTokens == null)
+      this.ownersTokens = [];
+
+    let token = null;
+    for (let index = 0; index < tokenIdList.length; index++) {
+
+      let token = this.database[tokenIdList[index] - 1];
+
+      token.approved = approved;
+      token.wrapped = true;
+      this.ownersTokens.push(token);
+    }
+
+    return 0;
+  }
 
   clearOwnersTokens() {
 
@@ -112,7 +163,7 @@ class t_ipc_database extends t_subscriptions {
     return (this.segment * this.segmentSize) + this.segmentSize;
   }
 
-  async requestOwnersTokens(owner, segment, total, wrapped, approved) {
+  async requestOwnersTokens(owner, requestedTotalTokens, wrapped, approved) {
 
     let segmentTotalTokens = 0;
 
@@ -120,8 +171,6 @@ class t_ipc_database extends t_subscriptions {
       segmentTotalTokens = -1;
     else
       segmentTotalTokens = this.segmentTotalTokens();
-
-    const requestedTotalTokens = (segment * total) + total
 
     if (this.ownersBalance != -1) {
 
@@ -142,9 +191,9 @@ class t_ipc_database extends t_subscriptions {
     while (segmentTotalTokens < requestedTotalTokens) {
 
       if (wrapped == true)
-        responce_id = await this.getOwnersUnwrappedTokens(owner, approved);
+        responce_id = await this.getOwnersWrappedTokens(owner, approved);
       else
-        responce_id = await this.getOwnersUnwrappedTokens(owner, approved); // FIX!
+        responce_id = await this.getOwnersUnwrappedTokens(owner, approved);
 
       if (responce_id < 0)
         break;
@@ -154,7 +203,15 @@ class t_ipc_database extends t_subscriptions {
 
     return 0;
 
-    /*
+  }
+
+  getOwnersTokens(segment, total, approved) {
+   
+    if (this.ownersTokens == null)
+      return null;
+
+    approved = typeof approved == "undefined" ||
+      approved == true ? true : false;
 
     let ownersTokens = [...this.ownersTokens];
 
@@ -162,11 +219,9 @@ class t_ipc_database extends t_subscriptions {
       (ipc) => { ipc.approved = approved; return ipc; })
 
     ownersTokens = ownersTokens.slice(
-      page * total, (page * total) + total);
+      segment * total, (segment * total) + total);
   
     return ownersTokens;
-
-    */
   }
 }
 
