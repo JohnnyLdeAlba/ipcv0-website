@@ -9,7 +9,6 @@ const muiTheme = createTheme({
 
     primary: { main: theme.primaryColor },
     secondary: { main: theme.secondaryColor },
-    switchColor: { main: theme.secondaryColor },
     background: { default: theme.backgroundColor }
   }
 });

@@ -14,9 +14,16 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import InputBase from '@mui/material/InputBase';
+import IconButton from '@mui/material/IconButton';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 import { Header } from "./Header";
 import { Backdrop } from "./Backdrop";
@@ -24,6 +31,9 @@ import { Card } from "./Card";
 import { ConnectDialog } from "./ConnectDialog";
 import { AccountDialog } from "./AccountDialog";
 import { WrapCaption, WrapRow, WrapControls } from "./WrapRow";
+
+import ArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import ArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
@@ -108,7 +118,7 @@ function WrapEffect(payload) {
       wrapped,
       true
     );
-    
+  
     show(true);
     setWrapped(wrapped);
     setRowsPerPage(rowsPerPage);
@@ -164,7 +174,7 @@ function WrapDialog(props) {
   const [ sortBy, setSortBy ] = React.useState("tokenId");
   const [ orderBy, setOrderBy ] = React.useState("asc");
   const [ rowsPerPage, setRowsPerPage ] = React.useState(10);
-  const [ page, setPage ] = React.useState(0);
+  let [ page, setPage ] = React.useState(0);
 
   React.useEffect(WrapEffect([
     wrapped,
@@ -180,25 +190,126 @@ function WrapDialog(props) {
     setPage
   ]));
 
+  const totalPages = Math.ceil(ipc_database.ownersBalance/rowsPerPage);
+
+  if (page < 0) page = 0;
+  else if (page >= totalPages) page = totalPages - 1;
+
   const ownersTokens = ipc_database.getOwnersTokens(
     page, rowsPerPage, sortBy, orderBy);
+
+  const title = wrapped ? "Wrapped IPCs" : "Unwrapped IPCs";
+  const subtitle = wrapped ? "These are IPCs that are wrapped and safe" :
+    "These are IPCs that are not wrapped and at risk";
+
+  const Pagination = styled(Box)({
+
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: "8px 16px 0 16px"
+  });
+
+  const PageControl = styled(Box)({
+
+    flex: 2,
+    fontSize: "14px",
+    fontWeight: "bold",
+    textAlign: "right"
+  });
+
+ // hide pages
+ // add delay to button for proper animation.
+
+  const style = {
+
+    inputLabel: {
+	    fontSize: "14px", 
+      color: theme.textColor,
+      "&.Mui-focused": { color: theme.textColor }
+      
+    },
+
+    select: {
+
+      padding: "8px",
+      fontSize: "12px",
+      backgroundColor: theme.selectColor,
+      color: theme.textColor,
+
+      "& .MuiSelect-icon": { color: theme.textColor },
+      "& .MuiInputBase-input": { fontSize: "12px",backgroundColor: theme.selectColor }
+    },
+
+    menuItem: {
+
+      backgroundColor: theme.selectColor,
+      color: theme.textColor,
+    }
+  };
+
+  const InputBaseC = styled(InputBase)({
+
+    backgroundColor: "red"
+  });
 
   return (
 
     <CardContainer show={ true }>
 
     <Card
-      icon={ <LockIcon />  }
-      title="Wrap/Unwrap IPCs"
-      subtitle="Wrap individual tokens"
+      icon={ wrapped ? <LockIcon /> : <LockOpenIcon /> }
+      title={ title }
+      subtitle={ subtitle }
     >
       <Table>
         <WrapCaption sortBy={ sortBy } orderBy={ orderBy } />
 	{ ownersTokens ? ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) : <></> }
 
-        <Box sx={{ padding: "12px 16px 8px 16px" }}>
-          <Box sx={{ fontSize: "14px", textAlign: "right" }}>1 of 1 &nbsp; &lt; &nbsp; &gt;</Box>
-	</Box>
+        <Pagination>
+	  <Box>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+
+	      <InputLabel id="demo-select-small" sx={style.inputLabel}>Show</InputLabel>
+
+	      <Select
+	          labelId="demo-select-small"
+	          id="demo-select-small"
+	          value={0}
+	          label="Show"
+	          MenuProps={{ sx: { "& .MuiMenu-paper": { backgroundColor: "red" }} }} 
+	          sx={style.select}
+	        >
+	          <MenuItem value={0}>Wrapped</MenuItem>
+	          <MenuItem value={1}>Unwrapped</MenuItem>
+	      </Select>
+	    </FormControl>
+	  </Box>
+	  <Box>
+            <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+
+	      <InputLabel id="demo-select-small" sx={style.inputLabel}>Rows per page</InputLabel>
+
+	      <Select
+	          labelId="demo-select-small"
+	          id="demo-select-small"
+	          value={0}
+	          label="Rows per page"
+	          MenuProps={{ sx: { "& .MuiMenu-paper": { backgroundColor: "red" }} }} 
+	          sx={style.select}
+	        >
+	          <MenuItem value={0}>Rows Per Page</MenuItem>
+	          <MenuItem value={1}>Unwrapped</MenuItem>
+	      </Select>
+	    </FormControl>
+	  </Box>
+
+          <PageControl>
+	    Page { page + 1 } of { totalPages }
+	    <IconButton color="secondary" onClick={ () => { setPage(page - 1); } }><ArrowLeftIcon /></IconButton>
+	    <IconButton color="secondary" onClick={ () => { setPage(page + 1); } }><ArrowRightIcon /></IconButton>
+	  </PageControl>
+	</Pagination>
       </Table>
     </Card>
     </CardContainer>

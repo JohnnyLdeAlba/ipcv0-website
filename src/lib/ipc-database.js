@@ -213,7 +213,6 @@ class t_ipc_database extends t_subscriptions {
     }
 
     return 0;
-
   }
 
   getOwnersTokens(segment, total, sort, order, approved) {

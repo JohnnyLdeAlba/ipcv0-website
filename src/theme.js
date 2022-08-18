@@ -14,7 +14,9 @@ const theme = {
   primaryColor: "#21262d",
   secondaryColor: "#9fb1c5",
   borderTopColor: "#21262d",
-  borderBottomColor: "#000000"
+  borderBottomColor: "#000000",
+  selectColor: "#161b22",
+  selectBorderColor: "#30363d"
 }
 
 export function getTheme() {
