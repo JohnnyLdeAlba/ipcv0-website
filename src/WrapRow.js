@@ -3,6 +3,15 @@ import React from "react";
 import { styled } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+
+import MenuList from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Switch from "@mui/material/Switch";
+
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import { getContext } from "./context";
 
@@ -161,11 +170,11 @@ function RowItem(props) {
       width: "33%",
     },
 
-    "@media (min-width: 700px)": {
+    "@media (min-width: 650px)": {
       width: "25%",
     },
 
-    "@media (min-width: 800px)": {
+    "@media (min-width: 850px)": {
       width: "20%",
     }
 
@@ -189,7 +198,7 @@ function Handedness(props) {
       display: "none"
     },
 
-    "@media (min-width: 800px)": {
+    "@media (min-width: 850px)": {
       display: "block"
     }
 
@@ -214,7 +223,7 @@ function Height(props) {
       display: "none"
     },
 
-    "@media (min-width: 700px)": {
+    "@media (min-width: 650px)": {
       display: "block"
     }
 
@@ -374,7 +383,95 @@ function unwrappedEvent(ipc, update, setUpdate) {
   };
 }
 
+export function WrapControls(props) {
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClickListItem = (event) => {
+	    setAnchorEl(event.currentTarget);
+	  };
+
+  const ControlRow = styled(Row)({
+
+    display: "none",
+    padding: "8px 0",
+
+  });
+
+  const SwitchWrapper = styled(Box)({
+
+    padding: "0 16px",
+    fontSize: "14px",
+    fontWeight: "bold"
+  });
+
+  const WrapSwitch = Switch;
+  return (<>
+	   <Button onClick={handleClickListItem} >test</Button>
+      <MenuList sx={{ '& .MuiPaper-root': { backgroundColor: "red"  }  }} open={anchorEl ? true : false} anchorEl={anchorEl} >
+        <MenuItem>test</MenuItem>
+      </MenuList>
+	  </>
+  );
+}
+
+function SortButton(props) {
+
+  const ArrowRightDisplay = props.show == false
+    ? "inline-block" : "none";
+
+  const ArrowUpDisplay = props.orderBy == "desc" && props.show == true
+    ? "inline-block" : "none";
+
+  const ArrowDownDisplay = props.orderBy == "asc" && props.show == true
+    ? "inline-block" : "none";
+
+  const SortButton = styled(IconButton)({
+
+    position: "absolute",
+    marginTop: "-8px",
+    color: theme.textColor,
+  });
+
+  const ArrowRight = styled(ArrowRightIcon)({
+    display: ArrowRightDisplay
+  });
+
+  const ArrowDropUp = styled(ArrowDropUpIcon)({
+    display: ArrowUpDisplay
+  });
+
+  const ArrowDropDown = styled(ArrowDropDownIcon)({
+    display: ArrowDownDisplay
+  });
+
+  return (
+    <SortButton onClick={ props.onClick }>
+      <ArrowRight />
+      <ArrowDropUp />
+      <ArrowDropDown />
+    </SortButton>
+  );
+}
+
+function onClick(sortBy, orderBy) {
+
+  return () => {
+
+    const _orderBy = orderBy == "asc" ? "desc" : "asc";
+    const payload = [ sortBy, _orderBy ];
+    context.processSubscription("sortWrapPanel", payload);
+  }
+}
+
 export function WrapCaption(props) {
+
+  const orderBy = props.orderBy == "asc" ? "asc" : "desc";
+  const tokenId = props.sortBy == "tokenId" ? true : false;
+  const race = props.sortBy == "race" ? true : false;
+  const gender = props.sortBy == "gender" ? true : false;
+  const height = props.sortBy == "height" ? true : false;
+  const handedness = props.sortBy == "handedness" ? true : false;
 
   const WrapCaption = styled(Row)({
 
@@ -391,6 +488,8 @@ export function WrapCaption(props) {
   });
 
   const CaptionItem = styled(RowItem)({
+
+    position: "relative",
     fontWeight: "bold"
   });
 
@@ -398,15 +497,56 @@ export function WrapCaption(props) {
     <WrapCaption>
       <Avatar>&nbsp;</Avatar>
       <Caption>
-        <CaptionItem>Token Id</CaptionItem>
-        <CaptionItem>Race</CaptionItem>
-        <CaptionItem type="gender">Gender</CaptionItem>
-        <CaptionItem type="height">Height</CaptionItem>
-        <CaptionItem type="handedness">Handedness</CaptionItem>
+
+        <CaptionItem>
+	  Token Id
+	  <SortButton
+	    show={ tokenId }
+	    orderBy={ orderBy }
+	    onClick={ onClick("tokenId", orderBy) }
+	  />
+	</CaptionItem>
+
+        <CaptionItem>
+	  Race
+	  <SortButton
+	    show={ race }
+	    orderBy={ orderBy }
+	    onClick={ onClick("race", orderBy) }
+	  />
+	</CaptionItem>
+
+        <CaptionItem type="gender">
+	  Gender
+	  <SortButton
+	    show={ gender }
+	    orderBy={ orderBy }
+	    onClick={ onClick("gender", orderBy) }
+	  />
+	</CaptionItem>
+
+        <CaptionItem type="height">
+	  Height
+	  <SortButton
+	    show={ height }
+	    orderBy={ orderBy }
+	    onClick={ onClick("height", orderBy) }
+	  />
+	</CaptionItem>
+
+        <CaptionItem type="handedness">
+	  Handedness
+	  <SortButton
+	    show={ handedness }
+	    orderBy={ orderBy }
+	    onClick={ onClick("handedness", orderBy) }
+	  />
+	</CaptionItem>
        </Caption>
+
        <Action>&nbsp;</Action>
     </WrapCaption>
-  );
+ );
 }
 
 export function WrapRow(props) {

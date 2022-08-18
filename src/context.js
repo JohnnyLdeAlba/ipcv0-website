@@ -51,6 +51,8 @@ export class t_context extends t_subscriptions {
     this.createSubscription("sessionUpdate");
     this.createSubscription("openMWCDialog");
     this.createSubscription("openAccountDialog");
+    this.createSubscription("sortWrapPanel");
+    this.createSubscription("updateWrapPanel");
 
     this.addSubscriber("connect", "context", onConnectWallet);
     this.addSubscriber("disconnect", "context", onDisconnectWallet);

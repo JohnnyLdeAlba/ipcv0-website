@@ -216,8 +216,8 @@ class t_ipc_database extends t_subscriptions {
 
   }
 
-  getOwnersTokens(segment, total, approved) {
-   
+  getOwnersTokens(segment, total, sort, order, approved) {
+
     if (this.ownersTokens == null)
       return null;
 
@@ -231,7 +231,29 @@ class t_ipc_database extends t_subscriptions {
 
     ownersTokens = ownersTokens.slice(
       segment * total, (segment * total) + total);
-  
+
+    const orderByAscending = (a, b) => {
+      return a < b ? -1 : 1;
+    };
+
+    const orderByDescending = (a, b) => {
+      return a > b ? -1 : 1;
+    };
+
+    const orderBy = order == "asc" ? orderByAscending : orderByDescending; 
+
+    let sortBy = (a, b) => { return 1; };
+
+    switch (sort) {
+
+      case "race": sortBy = (a, b) => { return orderBy(a.subrace, b.subrace); }; break;
+      case "gender": sortBy = (a, b) => { return orderBy(a.gender, b.gender); }; break;
+      case "height": sortBy = (a, b) => { return orderBy(a.height, b.height); }; break;
+      case "handedness": sortBy = (a, b) => { return orderBy(a.handedness, b.handedness); }; break;
+      default: sortBy = (a, b) => { return orderBy(a.token_id, b.token_id); }; break;
+    }
+
+    ownersTokens.sort(sortBy);
     return ownersTokens;
   }
 }

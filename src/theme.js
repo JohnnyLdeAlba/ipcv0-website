@@ -12,6 +12,7 @@ const theme = {
   backdropTransition: 500,
   backdropzIndex: 9999,
   primaryColor: "#21262d",
+  secondaryColor: "#9fb1c5",
   borderTopColor: "#21262d",
   borderBottomColor: "#000000"
 }

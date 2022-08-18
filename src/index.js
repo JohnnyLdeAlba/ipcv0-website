@@ -23,7 +23,7 @@ import { Backdrop } from "./Backdrop";
 import { Card } from "./Card";
 import { ConnectDialog } from "./ConnectDialog";
 import { AccountDialog } from "./AccountDialog";
-import { WrapCaption, WrapRow } from "./WrapRow";
+import { WrapCaption, WrapRow, WrapControls } from "./WrapRow";
 
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
@@ -90,6 +90,8 @@ function WrapEffect(payload) {
     page,
     show,
     setWrapped,
+    setSortBy,
+    setOrderBy,
     setRowsPerPage,
     setPage
   ] = payload
@@ -112,6 +114,14 @@ function WrapEffect(payload) {
     setRowsPerPage(rowsPerPage);
     setPage(page);
   }
+
+  context.addSubscriber("sortWrapPanel", "wrapPanel", (payload) => {
+
+    const [ sortBy, orderBy ] = payload;
+
+    setSortBy(sortBy);
+    setOrderBy(orderBy);
+  });
 
   context.addSubscriber("updateWrapPanel", "wrapPanel", async (payload) => {
 
@@ -138,7 +148,8 @@ function WrapEffect(payload) {
   });
 
   return () => {
-    context.aremoveSubscriber("updateWrapPanel", "wrapPanel");
+    context.removeSubscriber("sortWrapPanel", "wrapPanel");
+    context.removeSubscriber("updateWrapPanel", "wrapPanel");
   }
 
   }
@@ -152,7 +163,7 @@ function WrapDialog(props) {
   const [ wrapped, setWrapped ] = React.useState(true);
   const [ sortBy, setSortBy ] = React.useState("tokenId");
   const [ orderBy, setOrderBy ] = React.useState("asc");
-  const [ rowsPerPage, setRowsPerPage ] = React.useState(4);
+  const [ rowsPerPage, setRowsPerPage ] = React.useState(10);
   const [ page, setPage ] = React.useState(0);
 
   React.useEffect(WrapEffect([
@@ -163,12 +174,14 @@ function WrapDialog(props) {
     page,
     show,
     setWrapped,
+    setSortBy,
+    setOrderBy,
     setRowsPerPage,
     setPage
   ]));
 
   const ownersTokens = ipc_database.getOwnersTokens(
-    page, rowsPerPage);
+    page, rowsPerPage, sortBy, orderBy);
 
   return (
 
@@ -180,11 +193,7 @@ function WrapDialog(props) {
       subtitle="Wrap individual tokens"
     >
       <Table>
-
-	
-        <WrapCaption />
-	<Button onClick={ () => { setPage(page - 1);  }  }>Prev</Button>
-	<Button onClick={ () => { setPage(page + 1);  }  }>Next</Button>
+        <WrapCaption sortBy={ sortBy } orderBy={ orderBy } />
 	{ ownersTokens ? ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) : <></> }
 
         <Box sx={{ padding: "12px 16px 8px 16px" }}>
