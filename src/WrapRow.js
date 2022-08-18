@@ -129,16 +129,16 @@ function RowItem(props) {
   switch (props.type) {
 
     case "gender":
-      return (<Gender className={ props.className }>{ props.children }</Gender>);
+      return (<Gender className={ props.className } onClick={ props.onClick }>{ props.children }</Gender>);
     case "height":
-      return (<Height className={ props.className }>{ props.children }</Height>);
+      return (<Height className={ props.className } onClick={ props.onClick }>{ props.children }</Height>);
     case "handedness":
-      return (<Handedness className={ props.className }>{ props.children }</Handedness>);
+      return (<Handedness className={ props.className } onClick={ props.onClick }>{ props.children }</Handedness>);
   }
 
   const Label = styled(Box)({
 
-    display: "inline",
+    display: "inline-block",
     marginRight: "12px",
     fontWeight: "bold",
 
@@ -159,8 +159,6 @@ function RowItem(props) {
     "@media (min-width: 430px)": {
 
       display: "block",
-      flexDirection: "initial",
-
       padding: "0",
       width: "50%",
       textAlign: "center",
@@ -181,7 +179,7 @@ function RowItem(props) {
   });
 
   return (
-    <RowItem className={ props.className }>
+    <RowItem className={ props.className } onClick={ props.onClick }>
       { props.label ? <Label>{ props.label }</Label> : <></> }
       { props.children }
     </RowItem>
@@ -208,6 +206,7 @@ function Handedness(props) {
     <Handedness
       label={ props.label }
       className={ props.className }
+      onClick={ props.onClick }
     >
       { props.children }
     </Handedness>
@@ -233,6 +232,7 @@ function Height(props) {
     <Height
       label={ props.label }
       className={ props.className }
+      onClick={ props.onClick }
     >
       { props.children }
     </Height>
@@ -259,6 +259,7 @@ function Gender(props) {
     <Gender
       label={ props.label }
       className={ props.className }
+      onClick={ props.onClick }
     >
       { props.children }
     </Gender>);
@@ -426,10 +427,11 @@ function SortButton(props) {
   const ArrowDownDisplay = props.orderBy == "asc" && props.show == true
     ? "inline-block" : "none";
 
-  const SortButton = styled(IconButton)({
+  const SortButton = styled(Box)({
 
     position: "absolute",
-    marginTop: "-8px",
+    display: "inline-block",
+    margin: "-2px 0 0 6px",
     color: theme.textColor,
   });
 
@@ -489,6 +491,7 @@ export function WrapCaption(props) {
 
   const CaptionItem = styled(RowItem)({
 
+    userSelect: "none",
     position: "relative",
     fontWeight: "bold"
   });
@@ -498,48 +501,43 @@ export function WrapCaption(props) {
       <Avatar>&nbsp;</Avatar>
       <Caption>
 
-        <CaptionItem>
+        <CaptionItem onClick={ onClick("tokenId", orderBy) }>
 	  Token Id
 	  <SortButton
 	    show={ tokenId }
 	    orderBy={ orderBy }
-	    onClick={ onClick("tokenId", orderBy) }
 	  />
 	</CaptionItem>
 
-        <CaptionItem>
+        <CaptionItem onClick={ onClick("race", orderBy) }>
 	  Race
 	  <SortButton
 	    show={ race }
 	    orderBy={ orderBy }
-	    onClick={ onClick("race", orderBy) }
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="gender">
+        <CaptionItem type="gender" onClick={ onClick("gender", orderBy) }>
 	  Gender
 	  <SortButton
 	    show={ gender }
 	    orderBy={ orderBy }
-	    onClick={ onClick("gender", orderBy) }
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="height">
+        <CaptionItem type="height" onClick={ onClick("height", orderBy) }>
 	  Height
 	  <SortButton
 	    show={ height }
 	    orderBy={ orderBy }
-	    onClick={ onClick("height", orderBy) }
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="handedness">
+        <CaptionItem type="handedness" onClick={ onClick("handedness", orderBy) }>
 	  Handedness
 	  <SortButton
 	    show={ handedness }
 	    orderBy={ orderBy }
-	    onClick={ onClick("handedness", orderBy) }
 	  />
 	</CaptionItem>
        </Caption>
