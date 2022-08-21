@@ -111,15 +111,13 @@ function WrapEffect(payload) {
       );
     }
 
-
-
     context.addSubscriber("updateWrapPanel", "wrapPanel", (payload) => {
 
       const [ wrap_dialog ] = payload;
 	     
       ipc_database.requestOwnersTokens(
         "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
-        wrap_dialog.page * wrap_dialog.rowsPerPage,
+        (wrap_dialog.page + 1) * wrap_dialog.rowsPerPage,
         wrap_dialog.wrapped,
         true
       ).then(() => {

@@ -210,6 +210,10 @@ class t_ipc_database extends t_subscriptions {
       segmentTotalTokens = this.segmentTotalTokens();
     }
 
+
+    this.owner = owner;
+    this.wrapped = wrapped;
+
     return 0;
   }
 
