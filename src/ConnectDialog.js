@@ -111,8 +111,7 @@ export function ConnectDialog() {
   const connectWC = () => {
   
     context.getWalletProvider().connect();
-    context.processSubscription("closeConnectDialog");
-    context.processSubscription("hideBackdrop");
+    context.hideBackdrop();
   };
 
   return (

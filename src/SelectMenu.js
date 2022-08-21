@@ -72,7 +72,7 @@ export function SelectMenu(props) {
   }
 
   return (
-    <FormControl size="small" sx={{ marginRight: "16px", minWidth: props.width }}>
+    <FormControl size="small" sx={{ margin: "8px 16px 4px 0", minWidth: props.width }}>
 
       <SelectLabel id={ props.id }>
 	{ props.label }

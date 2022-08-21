@@ -131,7 +131,7 @@ function WrapEffect(payload) {
 
     });
 
-    if (ipc_database.ownersTokens == null) {
+    if (ipc_database.ownersBalance == -1) {
 
       wrap_dialog.visible = true;
       context.processSubscription(
@@ -195,6 +195,26 @@ class t_wrap_dialog {
   }
 }
 
+function WrapBlank(props) {
+
+  const WrapBlank = styled(Box)({
+  
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "40px 0",
+    borderStyle: "solid",
+    borderColor: `${ theme.borderTopColor } transparent ${ theme.borderBottomColor } transparent`,
+    borderWidth: "1px 0 1px 0",
+  });
+
+  return (
+    <WrapBlank>
+      You do not own any { props.wrapped ? "wrapped" : "unwrapped" } IPCs.
+    </WrapBlank>
+  );
+}
+
 function WrapDialog(props) {
 
   const ipc_database = context.ipc_database;
@@ -206,19 +226,28 @@ function WrapDialog(props) {
   const sortBy = wrap_dialog.sortBy;
   const orderBy = wrap_dialog.orderBy;
   const rowsPerPage = wrap_dialog.rowsPerPage;
-  let page = wrap_dialog.page;
+
+  const totalPages = ((totalPages) => { 
+    return totalPages ? totalPages : 1;
+  })(Math.ceil(ipc_database.ownersBalance/rowsPerPage));
+
+  const page = ((page) => {
+
+    if (page < 0)
+      return page = 0;
+    else if (page >= totalPages)
+      return totalPages - 1;
+    else
+      return page;
+
+  })(wrap_dialog.page);
+
+  wrap_dialog.page = page;
 
   React.useEffect(WrapEffect([
     wrap_dialog,
     setWrapDialog
   ]));
-
-  const totalPages = Math.ceil(ipc_database.ownersBalance/rowsPerPage);
-
-  if (page < 0) page = 0;
-  else if (page >= totalPages) page = totalPages - 1;
-
-  wrap_dialog.page = page;
 
   const prevPage = page + 1 == 1 ? "none" : "inline-block";
   const nextPage = page + 1 >= totalPages ? "none" : "inline-block";
@@ -304,7 +333,11 @@ function WrapDialog(props) {
     >
       <Table>
         <WrapCaption controller={ wrap_dialog } />
-	{ ownersTokens ? ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) : <></> }
+	{
+	  ownersTokens ?
+	  ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) :
+	    <WrapBlank wrapped={ wrapped } />
+	}
 
         <Pagination>
 

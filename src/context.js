@@ -89,19 +89,25 @@ export class t_context extends t_subscriptions {
     this.mwc_provider.autoConnect(this.session);
   }
 
+  hideBackdrop() {
+
+    this.processSubscription("hideCircular");   
+    this.processSubscription("closeConnectDialog");
+    this.processSubscription("closeAccountDialog");
+    this.processSubscription("hideBackdrop");
+    this.processSubscription("lockBackdrop", false);
+  }
+
   showCircular(visible) {
 
     if (visible) {
 
-      this.processSubscription("showCircular");    
-      this.processSubscription("showBackdrop");    
+      this.processSubscription("showCircular");
+      this.processSubscription("showBackdrop");
+      this.processSubscription("lockBackdrop", true);
     }
-    else {
-
-      this.processSubscription("hideCircular");    
-      this.processSubscription("hideBackdrop");    
-
-    }
+    else 
+      this.hideBackdrop();
   }
 }
 
