@@ -456,24 +456,30 @@ function SortButton(props) {
   );
 }
 
-function onClick(sortBy, orderBy) {
+function onClick(sortBy, controller) {
 
   return () => {
 
-    const _orderBy = orderBy == "asc" ? "desc" : "asc";
-    const payload = [ sortBy, _orderBy ];
-    context.processSubscription("sortWrapPanel", payload);
+    controller.sortBy = sortBy;
+    controller.orderBy = controller.orderBy == "asc"
+      ? "desc" : "asc";
+
+    context.processSubscription("sortWrapPanel", [ controller ]);
   }
 }
 
 export function WrapCaption(props) {
 
-  const orderBy = props.orderBy == "asc" ? "asc" : "desc";
-  const tokenId = props.sortBy == "tokenId" ? true : false;
-  const race = props.sortBy == "race" ? true : false;
-  const gender = props.sortBy == "gender" ? true : false;
-  const height = props.sortBy == "height" ? true : false;
-  const handedness = props.sortBy == "handedness" ? true : false;
+  const controller = props.controller;
+
+  const sortBy = controller.sortBy;
+  const orderBy = controller.orderBy;
+
+  const tokenId = sortBy == "tokenId" ? true : false;
+  const race = sortBy == "race" ? true : false;
+  const gender = sortBy == "gender" ? true : false;
+  const height = sortBy == "height" ? true : false;
+  const handedness = sortBy == "handedness" ? true : false;
 
   const WrapCaption = styled(Row)({
 
@@ -501,7 +507,7 @@ export function WrapCaption(props) {
       <Avatar>&nbsp;</Avatar>
       <Caption>
 
-        <CaptionItem onClick={ onClick("tokenId", orderBy) }>
+        <CaptionItem onClick={ onClick("tokenId", controller) }>
 	  Token Id
 	  <SortButton
 	    show={ tokenId }
@@ -509,7 +515,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem onClick={ onClick("race", orderBy) }>
+        <CaptionItem onClick={ onClick("race", controller) }>
 	  Race
 	  <SortButton
 	    show={ race }
@@ -517,7 +523,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="gender" onClick={ onClick("gender", orderBy) }>
+        <CaptionItem type="gender" onClick={ onClick("gender", controller) }>
 	  Gender
 	  <SortButton
 	    show={ gender }
@@ -525,7 +531,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="height" onClick={ onClick("height", orderBy) }>
+        <CaptionItem type="height" onClick={ onClick("height", controller) }>
 	  Height
 	  <SortButton
 	    show={ height }
@@ -533,7 +539,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="handedness" onClick={ onClick("handedness", orderBy) }>
+        <CaptionItem type="handedness" onClick={ onClick("handedness", controller) }>
 	  Handedness
 	  <SortButton
 	    show={ handedness }

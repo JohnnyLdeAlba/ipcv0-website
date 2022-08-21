@@ -180,8 +180,6 @@ class t_ipc_database extends t_subscriptions {
     if (this.wrapped != wrapped)
       this.resetOwnersTokens();
 
-/*  finish here.... */
-
     let segmentTotalTokens = 0;
 
     if (this.segment == -1)

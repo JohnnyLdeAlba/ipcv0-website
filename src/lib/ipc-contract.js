@@ -95,19 +95,6 @@ class t_ipc_contract extends t_subscriptions {
     this.createSubscription("approvalForAll");
     this.createSubscription("wrapped");
     this.createSubscription("unwrapped");
-
-    const ipc_contract = this;
-
-    setInterval(() => {
-      ipc_contract.processSubscription(
-        "approval", [ "approval", 0, true, 937 ]);
-      ipc_contract.processSubscription(
-        "wrapped", [ "wrapped", 0, 937, 0 ]);
-      ipc_contract.processSubscription(
-        "unwrapped", [ "unwrapped", 0, 937, 0 ]);
-
-      console.log("pending event");
-    }, 5000);
   }
 
   connect() {

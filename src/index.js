@@ -15,11 +15,6 @@ import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-
 
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LockIcon from '@mui/icons-material/Lock';
@@ -31,6 +26,7 @@ import { Card } from "./Card";
 import { ConnectDialog } from "./ConnectDialog";
 import { AccountDialog } from "./AccountDialog";
 import { WrapCaption, WrapRow, WrapControls } from "./WrapRow";
+import { SelectMenu } from "./SelectMenu";
 
 import ArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
@@ -89,79 +85,97 @@ function Table(props) {
   return (<Table>{ props.children }</Table>);
 }
 
-
 function WrapEffect(payload) {
 
   const [
-    wrapped,
-    sortBy,
-    orderBy,
-    rowsPerPage,
-    page,
-    show,
-    setWrapped,
-    setSortBy,
-    setOrderBy,
-    setRowsPerPage,
-    setPage
+    wrap_dialog,
+    setWrapDialog
   ] = payload
 
   const ipc_database = context.ipc_database;
 
-  return async () => {
-
-  if (ipc_database.ownersTokens == null) {
-
-    await ipc_database.requestOwnersTokens(
-      "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",  // context.mwc_provider.getAccountDetails().account,
-      page * rowsPerPage,
-      wrapped,
-      true
-    );
-  
-    show(true);
-    setWrapped(wrapped);
-    setRowsPerPage(rowsPerPage);
-    setPage(page);
-  }
-
-  context.addSubscriber("sortWrapPanel", "wrapPanel", (payload) => {
-
-    const [ sortBy, orderBy ] = payload;
-
-    setSortBy(sortBy);
-    setOrderBy(orderBy);
-  });
-
-  context.addSubscriber("updateWrapPanel", "wrapPanel", async (payload) => {
-
-    const [
-      visible,
-      wrapped,
-      rowsPerPage,
-      page
-    ] = payload;
-
-    if (visible != null) show(visible);
-    if (wrapped != null) setWrapped(wrapped);
-
-    setRowsPerPage(rowsPerPage);
-    setPage(page);
-
-    await ipc_database.requestOwnersTokens(
-      "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
-      page * rowsPerPage,
-      wrapped,
-      true
-    );
-
-  });
-
   return () => {
-    context.removeSubscriber("sortWrapPanel", "wrapPanel");
-    context.removeSubscriber("updateWrapPanel", "wrapPanel");
+
+    context.addSubscriber("sortWrapPanel", "wrapPanel", (payload) => {
+
+      const [ wrap_dialog ] = payload;
+      setWrapDialog(wrap_dialog.clone());
+    });
+
+    if (ipc_database.ownersTokens == null) {
+
+      wrap_dialog.visible = true;
+      context.processSubscription(
+        "updateWrapPanel",
+	[ wrap_dialog ]
+      );
+    }
+
+
+
+    context.addSubscriber("updateWrapPanel", "wrapPanel", (payload) => {
+
+      const [ wrap_dialog ] = payload;
+	     
+      ipc_database.requestOwnersTokens(
+        "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
+        wrap_dialog.page * wrap_dialog.rowsPerPage,
+        wrap_dialog.wrapped,
+        true
+      ).then(() => {
+        setWrapDialog(wrap_dialog.clone());
+      });
+
+    });
+
+    if (ipc_database.ownersTokens == null) {
+
+      wrap_dialog.visible = true;
+      context.processSubscription(
+        "updateWrapPanel",
+	[ wrap_dialog ]
+      );
+    }
+
+    return () => {
+
+      context.removeSubscriber("sortWrapPanel", "wrapPanel");
+      context.removeSubscriber("updateWrapPanel", "wrapPanel");
+    }
+  }
+}
+
+class t_wrap_dialog {
+
+  visible;
+  wrapped;
+  sortBy;
+  orderBy;
+  rowsPerPage;
+  page;
+
+  constructor() {
+
+    this.visible = false;
+    this.wrapped = false;
+    this.sortBy = "tokenId";
+    this.orderBy = "asc";
+    this.rowsPerPage = 10;
+    this.page = 0;
   }
 
+  clone() {
+    
+    const wrap_dialog = new t_wrap_dialog;
+
+    wrap_dialog.visible = this.visible;
+    wrap_dialog.wrapped = this.wrapped;
+    wrap_dialog.sortBy = this.sortBy;
+    wrap_dialog.orderBy = this.orderBy;
+    wrap_dialog.rowsPerPage = this.rowsPerPage;
+    wrap_dialog.page = this.page;
+
+    return wrap_dialog;
   }
 }
 
@@ -169,25 +183,18 @@ function WrapDialog(props) {
 
   const ipc_database = context.ipc_database;
 
-  const [ visible, show ] = React.useState(false);
-  const [ wrapped, setWrapped ] = React.useState(true);
-  const [ sortBy, setSortBy ] = React.useState("tokenId");
-  const [ orderBy, setOrderBy ] = React.useState("asc");
-  const [ rowsPerPage, setRowsPerPage ] = React.useState(10);
-  let [ page, setPage ] = React.useState(0);
+  const [ wrap_dialog, setWrapDialog ] = React.useState(new t_wrap_dialog);
+
+  const visible = wrap_dialog.visible;
+  const wrapped = wrap_dialog.wrapped;
+  const sortBy = wrap_dialog.sortBy;
+  const orderBy = wrap_dialog.orderBy;
+  const rowsPerPage = wrap_dialog.rowsPerPage;
+  let page = wrap_dialog.page;
 
   React.useEffect(WrapEffect([
-    wrapped,
-    sortBy,
-    orderBy,
-    rowsPerPage,
-    page,
-    show,
-    setWrapped,
-    setSortBy,
-    setOrderBy,
-    setRowsPerPage,
-    setPage
+    wrap_dialog,
+    setWrapDialog
   ]));
 
   const totalPages = Math.ceil(ipc_database.ownersBalance/rowsPerPage);
@@ -221,10 +228,26 @@ function WrapDialog(props) {
  // hide pages
  // add delay to button for proper animation.
 
+  const updateRowsPerPage = (event) => {
+
+    wrap_dialog.rowsPerPage = event.target.value;
+
+    ipc_database.processSubscription(
+      "updateWrapPanel", [ wrap_dialog ]);
+  };
+
+  const updateWrapped = (event) => {
+
+    wrap_dialog.wrapped = event.target.value == "wrapped" ? true : false;
+
+    ipc_database.processSubscription(
+      "updateWrapPanel", [ wrap_dialog  ]);
+  };
+
   const style = {
 
     inputLabel: {
-	    fontSize: "14px", 
+      fontSize: "14px", 
       color: theme.textColor,
       "&.Mui-focused": { color: theme.textColor }
       
@@ -248,14 +271,9 @@ function WrapDialog(props) {
     }
   };
 
-  const InputBaseC = styled(InputBase)({
-
-    backgroundColor: "red"
-  });
-
   return (
 
-    <CardContainer show={ true }>
+    <CardContainer show={ visible }>
 
     <Card
       icon={ wrapped ? <LockIcon /> : <LockOpenIcon /> }
@@ -263,51 +281,39 @@ function WrapDialog(props) {
       subtitle={ subtitle }
     >
       <Table>
-        <WrapCaption sortBy={ sortBy } orderBy={ orderBy } />
+        <WrapCaption controller={ wrap_dialog } />
 	{ ownersTokens ? ownersTokens.map(ipc => <WrapRow key={ ipc.token_id } ipc={ ipc } />) : <></> }
 
         <Pagination>
-	  <Box>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
 
-	      <InputLabel id="demo-select-small" sx={style.inputLabel}>Show</InputLabel>
+	  <SelectMenu
+	    id="wrappedSelect"
+	    label="Show"
+	    selected={ wrapped ? "wrapped" : "unwrapped" }
+	    items={[
+              { label: "Unwrapped", value: "unwrapped" },
+              { label: "Wrapped", value: "wrapped" }
+	    ]}
+	    onChange={ updateWrapped }
+	    width="140px" />
 
-	      <Select
-	          labelId="demo-select-small"
-	          id="demo-select-small"
-	          value={0}
-	          label="Show"
-	          MenuProps={{ sx: { "& .MuiMenu-paper": { backgroundColor: "red" }} }} 
-	          sx={style.select}
-	        >
-	          <MenuItem value={0}>Wrapped</MenuItem>
-	          <MenuItem value={1}>Unwrapped</MenuItem>
-	      </Select>
-	    </FormControl>
-	  </Box>
-	  <Box>
-            <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-
-	      <InputLabel id="demo-select-small" sx={style.inputLabel}>Rows per page</InputLabel>
-
-	      <Select
-	          labelId="demo-select-small"
-	          id="demo-select-small"
-	          value={0}
-	          label="Rows per page"
-	          MenuProps={{ sx: { "& .MuiMenu-paper": { backgroundColor: "red" }} }} 
-	          sx={style.select}
-	        >
-	          <MenuItem value={0}>Rows Per Page</MenuItem>
-	          <MenuItem value={1}>Unwrapped</MenuItem>
-	      </Select>
-	    </FormControl>
-	  </Box>
+	  <SelectMenu
+	    id="rowsSelect"
+	    label="Rows per page"
+	    selected={ rowsPerPage }
+	    items={[
+              { label: "5", value: 5 },
+              { label: "10", value: 10 },
+              { label: "25", value: 25 },
+              { label: "50", value: 50 }
+	    ]}
+	    onChange={ updateRowsPerPage }
+	    width="140px" />
 
           <PageControl>
 	    Page { page + 1 } of { totalPages }
-	    <IconButton color="secondary" onClick={ () => { setPage(page - 1); } }><ArrowLeftIcon /></IconButton>
-	    <IconButton color="secondary" onClick={ () => { setPage(page + 1); } }><ArrowRightIcon /></IconButton>
+	    <IconButton color="secondary" onClick={ () => { } }><ArrowLeftIcon /></IconButton>
+	    <IconButton color="secondary" onClick={ () => { } }><ArrowRightIcon /></IconButton>
 	  </PageControl>
 	</Pagination>
       </Table>
