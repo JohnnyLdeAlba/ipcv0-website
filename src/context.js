@@ -88,6 +88,21 @@ export class t_context extends t_subscriptions {
     this.getSession();
     this.mwc_provider.autoConnect(this.session);
   }
+
+  showCircular(visible) {
+
+    if (visible) {
+
+      this.processSubscription("showCircular");    
+      this.processSubscription("showBackdrop");    
+    }
+    else {
+
+      this.processSubscription("hideCircular");    
+      this.processSubscription("hideBackdrop");    
+
+    }
+  }
 }
 
 const context = new t_context();

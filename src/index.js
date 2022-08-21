@@ -16,6 +16,7 @@ import Button from "@mui/material/Button";
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 
+import MUICircularProgress from "@mui/material/CircularProgress";
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -115,12 +116,16 @@ function WrapEffect(payload) {
 
       const [ wrap_dialog ] = payload;
 	     
+      context.showCircular(true);
+
       ipc_database.requestOwnersTokens(
         "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
         (wrap_dialog.page + 1) * wrap_dialog.rowsPerPage,
         wrap_dialog.wrapped,
         true
       ).then(() => {
+
+	context.showCircular(false);
         setWrapDialog(wrap_dialog.clone());
       });
 
@@ -258,7 +263,7 @@ function WrapDialog(props) {
     wrap_dialog.wrapped = event.target.value == "wrapped" ? true : false;
 
     ipc_database.processSubscription(
-      "updateWrapPanel", [ wrap_dialog  ]);
+      "updateWrapPanel", [ wrap_dialog ]);
   };
 
   const style = {
@@ -339,6 +344,48 @@ function WrapDialog(props) {
   );
 }
 
+function CircularEffect(context, show) {
+
+  return () => {
+
+    context.createSubscription("showCircular");
+    context.createSubscription("hideCircular");
+
+    context.addSubscriber("showCircular", "circular", () => { show(true); });
+    context.addSubscriber("hideCircular", "circular", () => { show(false); });
+
+    return () => {
+
+      context.removeSubscriber("showCircular", "circular");
+      context.removeSubscriber("hideCircular", "circular");
+    };
+  }
+}
+
+
+
+function CircularProgress(props) {
+
+  const [ visible, show ] = React.useState(false);
+
+  const display = visible ? "inline-block" : "none";
+
+  React.useEffect(CircularEffect(context, show));
+
+  const CircularProgress = styled(MUICircularProgress)({
+    display: display
+  });
+
+  return (
+    <CircularProgress
+      variant="indeterminate"
+      size={60}
+      thickness={6}
+      color="secondary"
+    />
+  );
+}
+
 function Layout(props) {
 
   const _Layout = styled(Box)({
@@ -356,7 +403,7 @@ function Layout(props) {
       <Backdrop>
         <ConnectDialog /> 
         <AccountDialog />
-
+        <CircularProgress />
       </Backdrop>
       <_Layout>
         <Header />
