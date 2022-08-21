@@ -143,6 +143,19 @@ function WrapEffect(payload) {
   }
 }
 
+function changePage(wrap_dialog, nextPage) {
+
+  return () => {
+
+    wrap_dialog.page+= nextPage;
+
+    context.processSubscription(
+      "updateWrapPanel",
+      [ wrap_dialog ]
+    );
+  }
+}
+
 class t_wrap_dialog {
 
   visible;
@@ -200,6 +213,11 @@ function WrapDialog(props) {
   if (page < 0) page = 0;
   else if (page >= totalPages) page = totalPages - 1;
 
+  wrap_dialog.page = page;
+
+  const prevPage = page + 1 == 1 ? "none" : "inline-block";
+  const nextPage = page + 1 >= totalPages ? "none" : "inline-block";
+
   const ownersTokens = ipc_database.getOwnersTokens(
     page, rowsPerPage, sortBy, orderBy);
 
@@ -223,6 +241,7 @@ function WrapDialog(props) {
     textAlign: "right"
   });
 
+  // add NO IPCs view!
  // hide pages
  // add delay to button for proper animation.
 
@@ -310,8 +329,8 @@ function WrapDialog(props) {
 
           <PageControl>
 	    Page { page + 1 } of { totalPages }
-	    <IconButton color="secondary" onClick={ () => { } }><ArrowLeftIcon /></IconButton>
-	    <IconButton color="secondary" onClick={ () => { } }><ArrowRightIcon /></IconButton>
+	    <IconButton color="secondary" sx={{ display: prevPage }} onClick={ changePage(wrap_dialog, -1) }><ArrowLeftIcon /></IconButton>
+	    <IconButton color="secondary" sx={{ display: nextPage }} onClick={ changePage(wrap_dialog, 1) }><ArrowRightIcon /></IconButton>
 	  </PageControl>
 	</Pagination>
       </Table>
