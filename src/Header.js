@@ -70,7 +70,7 @@ function OpenSeaIcon() {
   });
 
   return (
-    <Link href="https://opensea.io/collection/immortalplayercharacters-v0-wrapped">
+    <Link href="https://opensea.io/collection/immortal-player-characters-v0-wrapped">
       <Image src="assets/opensea.svg" />
     </Link>
   );

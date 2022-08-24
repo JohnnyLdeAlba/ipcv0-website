@@ -34,9 +34,6 @@ function wrappedEvent(ipc_contract) {
 
   return (tokenId, owner) => {
 
-    console.log("wrapped");
-    console.log(tokenId + " " + owner);
-
     ipc_contract.processSubscription(
       "wrapped",
       [ "wrapped", tokenId, owner ]
@@ -47,9 +44,6 @@ function wrappedEvent(ipc_contract) {
 function unwrappedEvent(ipc_contract) {
 
   return (tokenId, owner) => {
-
-    console.log("unwrapped");
-    console.log(tokenId + " " + owner);
 
     ipc_contract.processSubscription(
       "unwrapped",
@@ -89,12 +83,18 @@ class t_ipc_contract extends t_subscriptions {
 
   initialize() {
 
-    // this.defaultProvider = new ethers.providers.JsonRpcProvider(this.providerURI);
+    if (config.developerMode == true) {
 
-    this.defaultProvider = ethers.getDefaultProvider(
-      "homestead",
-      { alchemy: this.providerURI }
-    );
+      this.defaultProvider = new ethers.providers
+        .JsonRpcProvider(this.providerURI);
+    }
+    else {
+
+      this.defaultProvider = ethers.getDefaultProvider(
+        "homestead",
+        { alchemy: this.providerURI }
+      );
+    }
 
     this.mwc_provider.addSubscriber("connect", "ipcContract",
       () => { this.connect(); });
@@ -128,8 +128,6 @@ class t_ipc_contract extends t_subscriptions {
 
     sourceContract.on("ApprovalForAll", approvalForAllEvent(this));
     sourceContract.on("Approval", approvalEvent(this));
-
-    console.log(wrapperContract.filters.Unwrapped(null, null));
 
     wrapperContract.on(wrapperContract.filters.Wrapped(null, null), wrappedEvent(this));
     wrapperContract.on(wrapperContract.filters.Unwrapped(null, null), unwrappedEvent(this));
@@ -205,7 +203,7 @@ class t_ipc_contract extends t_subscriptions {
       this.wrapperAddress, wrapperABI, this.defaultProvider);
 
     const ownersTokens = await wrapperContract
-      .getTokensOfOwner(owner, startIndex, total)
+      .wGetTokensOfOwner(owner, startIndex, total)
         .catch(error => null);
 
     if (ownersTokens == null)
@@ -283,7 +281,7 @@ class t_ipc_contract extends t_subscriptions {
   }
 
   async wrap(tokenId) {
-    
+   
     if (this.provider == null)
       return false;
     
@@ -293,6 +291,8 @@ class t_ipc_contract extends t_subscriptions {
       .connect(signer)
       .wrap(tokenId)
       .catch(error => false);
+
+    // Need to handle errors right.
 
     return tx == false ? false : tx;
   }

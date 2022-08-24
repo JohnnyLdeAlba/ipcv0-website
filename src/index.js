@@ -119,7 +119,7 @@ function WrapEffect(payload) {
       context.showCircular(true);
 
       ipc_database.requestOwnersTokens(
-        "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
+        "0xE185e4A8e4E5A73B5899fb20Cd73f7Af5AEa8440",
         (wrap_dialog.page + 1) * wrap_dialog.rowsPerPage,
         wrap_dialog.wrapped,
         true

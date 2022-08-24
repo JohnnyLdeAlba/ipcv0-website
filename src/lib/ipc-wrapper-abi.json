@@ -1,6 +1,12 @@
   [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_contractAddress",
+          "type": "address"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
@@ -343,77 +349,6 @@
           "internalType": "struct IPCWrapper.t_properties",
           "name": "",
           "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "startIndex",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "total",
-          "type": "uint256"
-        }
-      ],
-      "name": "getTokensOfOwner",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "tokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "name",
-              "type": "string"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "attributeSeed",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "dna",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint128",
-              "name": "experience",
-              "type": "uint128"
-            },
-            {
-              "internalType": "uint128",
-              "name": "timeOfBirth",
-              "type": "uint128"
-            },
-            {
-              "internalType": "address",
-              "name": "owner",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "price",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct IPCWrapper.t_raw_ipc[]",
-          "name": "",
-          "type": "tuple[]"
         }
       ],
       "stateMutability": "view",
@@ -996,12 +931,102 @@
           "type": "address"
         }
       ],
+      "name": "wBalanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
       "name": "wGetTokenIdsOfOwner",
       "outputs": [
         {
           "internalType": "uint256[]",
           "name": "",
           "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startIndex",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "total",
+          "type": "uint256"
+        }
+      ],
+      "name": "wGetTokensOfOwner",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "attributeSeed",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "dna",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint128",
+              "name": "experience",
+              "type": "uint128"
+            },
+            {
+              "internalType": "uint128",
+              "name": "timeOfBirth",
+              "type": "uint128"
+            },
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IPCWrapper.t_raw_ipc[]",
+          "name": "",
+          "type": "tuple[]"
         }
       ],
       "stateMutability": "view",
@@ -1044,6 +1069,25 @@
       "name": "wrap",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "wuwOwnerOf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }
   ]
