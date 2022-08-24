@@ -4,6 +4,10 @@ import wrapperABI from "./ipc-wrapper-abi.json";
 import { ethers } from "ethers";
 import { t_subscriptions } from "./subscriptions";
 
+import { getConfig } from "../config";
+
+const config = getConfig();
+
 function approvalEvent(ipc_contract) {
 
   return (owner, approved, tokenId) => {
@@ -28,22 +32,28 @@ function approvalForAllEvent(ipc_contract) {
 
 function wrappedEvent(ipc_contract) {
 
-  return (tokenIndex, tokenId, owner) => {
+  return (tokenId, owner) => {
+
+    console.log("wrapped");
+    console.log(tokenId + " " + owner);
 
     ipc_contract.processSubscription(
       "wrapped",
-      [ "wrapped", tokenIndex, tokenId, owner ]
+      [ "wrapped", tokenId, owner ]
     );
   }
 }
 
 function unwrappedEvent(ipc_contract) {
 
-  return (tokenIndex, tokenId, owner) => {
+  return (tokenId, owner) => {
+
+    console.log("unwrapped");
+    console.log(tokenId + " " + owner);
 
     ipc_contract.processSubscription(
-      "unwraped",
-      [ "unwrapped", tokenIndex, tokenId, owner ]
+      "unwrapped",
+      [ "unwrapped", tokenId, owner ]
     );
   }
 }
@@ -65,8 +75,8 @@ class t_ipc_contract extends t_subscriptions {
 
     super();
 
-    this.sourceAddress = "0x4787993750B897fBA6aAd9e7328FC4F5C126e17c";
-    this.wrapperAddress = "0xD0f54E91ee2e57EA72B0836565E8dfFDb0a5F950";
+    this.sourceAddress = config.sourceContract;
+    this.wrapperAddress = config.wrapperContract;
 
     this.providerURI = null;
     this.mwc_provider = null;
@@ -74,10 +84,12 @@ class t_ipc_contract extends t_subscriptions {
     this.defaultProvider = null;
 
     this.sourceContract = null;
-    this.wrappereContract = null;
+    this.wrapperContract = null;
   }
 
   initialize() {
+
+    // this.defaultProvider = new ethers.providers.JsonRpcProvider(this.providerURI);
 
     this.defaultProvider = ethers.getDefaultProvider(
       "homestead",
@@ -95,11 +107,16 @@ class t_ipc_contract extends t_subscriptions {
     this.createSubscription("approvalForAll");
     this.createSubscription("wrapped");
     this.createSubscription("unwrapped");
+
+    // this.wrap(0);
   }
 
   connect() {
 
     const web3_provider = this.mwc_provider.getWeb3Provider();
+    if (web3_provider == null)
+      return;
+
     const provider = new ethers.providers.Web3Provider(web3_provider);
 
     const signer = provider.getSigner();
@@ -112,8 +129,10 @@ class t_ipc_contract extends t_subscriptions {
     sourceContract.on("ApprovalForAll", approvalForAllEvent(this));
     sourceContract.on("Approval", approvalEvent(this));
 
-    wrapperContract.on("Wrapped", wrappedEvent(this));
-    wrapperContract.on("Unwrapped", unwrappedEvent(this));
+    console.log(wrapperContract.filters.Unwrapped(null, null));
+
+    wrapperContract.on(wrapperContract.filters.Wrapped(null, null), wrappedEvent(this));
+    wrapperContract.on(wrapperContract.filters.Unwrapped(null, null), unwrappedEvent(this));
 
     this.provider = provider;
     this.sourceContract = sourceContract;
@@ -125,6 +144,20 @@ class t_ipc_contract extends t_subscriptions {
     this.provider = null;
     this.sourceContract = null;
     this.wrapperContract = null;
+  }
+
+  async totalSupply() {
+
+    if (this.defaultProvider == null)
+      return null;
+
+    const wrapperContract = new ethers.Contract(
+      this.wrapperAddress, wrapperABI, this.defaultProvider);
+
+    const total = await wrapperContract.totalSupply()
+      .catch(error => 0);
+
+    return total;
   }
 
   async wBalanceOf(owner) {
@@ -235,15 +268,50 @@ class t_ipc_contract extends t_subscriptions {
     
     const signer = this.provider.getSigner();
 
-    const tx = await this.wrapperContract
+    // old contract here....
+    const tx = await this.sourceContract
       .connect(signer)
       .approve(this.wrapperAddress, tokenId)
         .catch((error) => {
-
+          console.log(error);
+          return false;
         });
+
+    console.log(tx);
 
     return true;
   }
+
+  async wrap(tokenId) {
+    
+    if (this.provider == null)
+      return false;
+    
+    const signer = this.provider.getSigner();
+
+    const tx = await this.wrapperContract
+      .connect(signer)
+      .wrap(tokenId)
+      .catch(error => false);
+
+    return tx == false ? false : tx;
+  }
+
+  async unwrap(tokenId) {
+
+    if (this.provider == null)
+      return false;
+    
+    const signer = this.provider.getSigner();
+
+    const tx = await this.wrapperContract
+      .connect(signer)
+      .unwrap(tokenId)
+      .catch(error => false);
+
+    return tx == false ? false : tx;
+  }
+
 }
 
 export function createIPCContract() {

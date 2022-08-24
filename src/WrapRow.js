@@ -307,12 +307,20 @@ function approvalEvent(ipc, update, setUpdate) {
 
 function wrappedEvent(ipc, update, setUpdate) {
 
+  const ipc_contract = context.ipc_contract;
+
   return async () => {
 
     if (ipc.pending == true)
       return;
 
     // open dialog
+
+    const tx = await ipc_contract.wrap(ipc.token_id);
+    if (tx == false)
+      return;
+
+    console.log(tx);
 
     ipc.pending = true;
     setUpdate(++update);
@@ -324,11 +332,13 @@ function wrappedEvent(ipc, update, setUpdate) {
       resourceId,
       (payload) => {
 
-        const [ eventId, tokenIndex, tokenId, owner ] = payload;
+        const [ eventId, tokenId, owner ] = payload;
 
         if (eventId != "wrapped" ||
           tokenId != ipc.token_id)
             return;
+
+        console.log(tokenId);
 
         ipc.wrapped = true;
         ipc.pending = false;
@@ -346,12 +356,20 @@ function wrappedEvent(ipc, update, setUpdate) {
 
 function unwrappedEvent(ipc, update, setUpdate) {
 
+  const ipc_contract = context.ipc_contract;
+
   return async () => {
 
     if (ipc.pending == true)
       return;
 
     // open dialog
+
+    const tx = await ipc_contract.unwrap(ipc.token_id);
+    if (tx == false)
+      return;
+
+    console.log(tx);
 
     ipc.pending = true;
     setUpdate(++update);
@@ -363,7 +381,11 @@ function unwrappedEvent(ipc, update, setUpdate) {
       resourceId,
       (payload) => {
 
-        const [ eventId, tokenIndex, tokenId, owner ] = payload;
+        const [ eventId, tokenId, owner ] = payload;
+
+        console.log(eventId);
+        console.log(tokenId);
+        console.log(owner);
 
         if (eventId != "unwrapped" ||
           tokenId != ipc.token_id)

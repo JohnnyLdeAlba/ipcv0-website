@@ -148,6 +148,7 @@ function WrapEffect(payload) {
   }
 }
 
+// Need to fix if has no wraspped IPCs.
 function changePage(wrap_dialog, nextPage) {
 
   return () => {

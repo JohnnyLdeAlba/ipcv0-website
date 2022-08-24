@@ -123,7 +123,10 @@ class t_metamask extends t_subscriptions {
     this.providerEnabled = false;
     this.providerName = "MetaMask";
     this.chainId = null;
+    
+    // this.defaultChainId = "0x29a";
     this.defaultChainId = "0x1";
+
     this.account = null;
     this.connected = false;
     this.response = null;

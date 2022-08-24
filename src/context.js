@@ -38,6 +38,8 @@ export class t_context extends t_subscriptions {
     const config = this.getConfig();
 
     this.mwc_provider = createMWCProvider();
+    this.mwc_provider.setDefaultChainId(config.defaultChainId);
+
     this.mwc_provider.subscriptions = this.subscriptions;
     this.mwc_provider.initialize();
 
@@ -108,6 +110,10 @@ export class t_context extends t_subscriptions {
     }
     else 
       this.hideBackdrop();
+  }
+
+  async delay() {
+    return new Promise(resolve => setTimeout(resolve, 500));
   }
 }
 

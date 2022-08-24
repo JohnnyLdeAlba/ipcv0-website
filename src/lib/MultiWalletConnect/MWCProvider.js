@@ -4,6 +4,7 @@ import { t_subscriptions } from "../subscriptions"
 
 class t_multi_wallet_connect extends t_subscriptions {
 
+  defaultChainId;
   mm_provider;
   wc_provider;
 
@@ -11,6 +12,7 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     super();
 
+    this.defaultChainId = "0x1";
     this.mm_provider = null;
     this.wc_provider = null;
   }
@@ -19,7 +21,10 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     this.mm_provider = createMMProvider();
     this.wc_provider = createWCProvider();
-    
+
+    this.mm_provider.setDefaultChainId(this.defaultChainId);
+    this.wc_provider.setDefaultChainId(this.defaultChainId);
+
     this.createSubscription("connect");
     this.createSubscription("disconnect");
     this.createSubscription("sessionUpdate");
