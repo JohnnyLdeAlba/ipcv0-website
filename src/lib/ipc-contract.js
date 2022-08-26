@@ -72,6 +72,19 @@ function unwrappedEvent(ipc_contract) {
   }
 }
 
+function wrapXEvent(ipc_contract) {
+
+  return (owner, wrapTokens) => {
+
+    ipc_contract.processSubscription(
+      "wrapX",
+      [ "wrapX", owner, wrapTokens ]
+    );
+  }
+}
+
+
+
 class t_ipc_contract extends t_subscriptions {
 
   sourceAddress;
@@ -127,6 +140,7 @@ class t_ipc_contract extends t_subscriptions {
     this.createSubscription("approvalForAll");
     this.createSubscription("wrapped");
     this.createSubscription("unwrapped");
+    this.createSubscription("wrapX")
   }
 
   connect() {
@@ -149,6 +163,7 @@ class t_ipc_contract extends t_subscriptions {
 
     wrapperContract.on(wrapperContract.filters.Wrapped(null, null), wrappedEvent(this));
     wrapperContract.on(wrapperContract.filters.Unwrapped(null, null), unwrappedEvent(this));
+    wrapperContract.on(wrapperContract.filters.WrapX(null, null), wrapXEvent(this));
 
     this.provider = provider;
     this.sourceContract = sourceContract;
@@ -288,11 +303,16 @@ class t_ipc_contract extends t_subscriptions {
     const sourceContract = new ethers.Contract(
       this.sourceAddress, sourceABI, this.defaultProvider);
 
+    console.log(signer.address);
+    console.log(this.wrapperAddress);
+
     const approvedForAll = await sourceContract
       .isApprovedForAll(
         signer.address,
 	this.wrapperAddress)
-      .catch(error => false);
+      .catch(error => { console.log(error); return false });
+
+    console.log(approvedForAll);
 
     return approvedForAll;
   }
@@ -398,6 +418,31 @@ class t_ipc_contract extends t_subscriptions {
 
     return tx;
   }
+
+  async wrapX(total, wrapTokens) {
+
+    if (this.provider == null)
+      return { code: -1, payload: "NOT_CONNECTED" };
+    
+    const signer = this.provider.getSigner();
+
+    wrapTokens = typeof wrapTokens == "undefined" ||
+      wrapTokens == true ? true : false;
+
+    const tx = await this.wrapperContract
+      .connect(signer)
+      .wrapX(total, wrapTokens)
+      .catch((error) => {
+        return { code: -1, payload: parseTx(error) };
+      });
+
+    if (typeof tx.code == "undefined")
+      return { code: 0, payload: parseTx(tx) };
+
+    return tx;
+  }
+
+
 }
 
 export function createIPCContract() {

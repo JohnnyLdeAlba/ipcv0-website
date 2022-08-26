@@ -17,8 +17,8 @@ class t_config {
 
       this.providerURI = "http://127.0.0.1:8545";
       this.defaultChainId = "0x29a";
-      this.sourceContract = "0x0B0D1b85d526760E29b771268bB90e2e5cCd30a8";
-      this.wrapperContract = "0xf68c5E6605e9EF0F1E2B46890261A28B60E0E8b8";
+      this.sourceContract = "0xB0E98CfB54aC4485e034F8634AeD784C6284a26f";
+      this.wrapperContract = "0xc7348C0BCeE812B9920B40679B69f503B210a31f";
     }
     else {
 

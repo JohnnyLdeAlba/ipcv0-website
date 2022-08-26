@@ -198,7 +198,7 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
     if (approvalForAll == "pending")
       return;
 
-    const enabled = approvalForAll == "enabled" ? false : true;
+    const enabled = approvalForAll == "enabled" ? true : false;
 
     const tx = await ipc_contract.setApprovalForAll(enabled);
     if (tx.code == -1) {
@@ -232,9 +232,9 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
           return;
 
         if (approved)
-          setApprovalForAll("enabled");
-        else
           setApprovalForAll("disabled");
+        else
+          setApprovalForAll("enabled");
 
         context.openSnackbar(
           "success",
@@ -251,11 +251,73 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
   };
 }
 
+function wrapXEvent(wrapX, setWrapX, wrapAll) {
+
+  const ipc_contract = context.ipc_contract;
+
+  return async () => {
+
+    if (wrapX == "pending")
+      return;
+
+    const tx = await ipc_contract.wrapX(0, wrapAll);
+    if (tx.code == -1) {
+
+      context.openSnackbar(
+        "error",
+        lang.getCaption("MUST_BE_APPROVED"),
+        lang.getMessage("MUST_BE_APPROVED")
+      );    
+
+      return;
+    }
+
+    context.openSnackbar(
+      "pending",
+      lang.getCaption("APPROVAL_PENDING"),
+      lang.getMessage("APPROVAL_PENDING"),
+      "https://etherscan.io/tx/" + tx.payload
+    );    
+
+    setWrapX("pending");
+
+    context.addSubscriber(
+      "wrapX",
+      "wrapX",
+      (payload) => {
+
+        const [ eventId, owner, wrapTokens ] = payload;
+
+        if (eventId != "wrapX")
+          return;
+
+	if (wrapAll)
+          setWrapX("wrapAll");
+        else
+          setWrapX("unwrapAll");
+
+        context.openSnackbar(
+          "success",
+          lang.getCaption("APPROVAL_OK"),
+          lang.getMessage("APPROVAL_OK")
+        );    
+
+	context.removeSubscriber(
+          "wrapX",
+          "wrapX"
+        );
+      } 
+    );
+  };
+}
+
 
 
 function WrapControlPanel() {
 
   const [ approvalForAll, setApprovalForAll ] = React.useState("disabled");
+  const [ wrapAll, setWrapAll ] = React.useState("wrapAll");
+  const [ unwrapAll, setUnwrapAll ] = React.useState("unwrapAll");
 
   // use effect to get current status of approval for all.
 
@@ -280,7 +342,7 @@ function WrapControlPanel() {
 
   const approvalForAllLabel = ((state) => {
 
-    switch (approvalForAll) {
+    switch (state) {
 
       case "enabled": return "Enabled";
       case "disabled": return "Disabled";
@@ -305,6 +367,21 @@ function WrapControlPanel() {
             <PendingButton variant="contained" onClick={ setApprovalForAllEvent(approvalForAll, setApprovalForAll) }>
 	      { approvalForAllLabel }
 	    </PendingButton>
+	  </Box>
+	</Row>
+        <Row> 
+          <Box>
+            <Box>Wrap All</Box>
+            <Box>...</Box>
+	  </Box>
+          <Box sx={{ flex: 1, textAlign: "right" } }>
+            <PendingButton variant="contained" onClick={ wrapXEvent(wrapAll, setWrapAll, true) }>
+	      { wrapAll == "wrapAll" ? "Wrap All" : "Pending" }
+	    </PendingButton>
+            <PendingButton variant="contained" onClick={ wrapXEvent(unwrapAll, setUnwrapAll, false) }>
+	      { unwrapAll == "unwrapAll" ? "Unwrap All" : "Pending" }
+	    </PendingButton>
+
 	  </Box>
 	</Row>
       </CardBody>
