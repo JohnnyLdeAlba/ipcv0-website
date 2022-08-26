@@ -70,6 +70,7 @@ export class t_context extends t_subscriptions {
 
   getConfig() { return getConfig(); }
   getTheme() { return getTheme(); }
+  getLang() { return getConfig().lang; }
 
   getWalletProvider() {
     return this.mwc_provider;

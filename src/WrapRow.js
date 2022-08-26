@@ -17,47 +17,7 @@ import { getContext } from "./context";
 
 const context = getContext();
 const theme = context.getTheme();
-
-class t_lang {
-
-  key;
-  value;
-
-  constructor() {
-
-    key = "";
-    value = "";
-  }
-
-  set(key, value) {
-
-    this.key = key;
-    this.value = value;
-  }
-}
-
-const eng_caption = [];
-
-eng_caption.push(new t_lang("APPROVAL_FOR_ALL_NOT_OWNER", "Unable to set approval for all. The connected wallet does not have authorization."));
-eng_caption.push(new t_lang("APPROVAL_NOT_OWNER", "Unable to approve token. The connected wallet does not own token."));
-eng_caption.push(new t_lang("TOKEN_LIMIT_REACHED", "Unable to wrap token. The token limit has been reached."));
-eng_caption.push(new t_lang("TOKEN_ALREADY_WRAPPED", "The selected token has already been wrapped."));
-eng_caption.push(new t_lang("WRAPPED_NOT_OWNER", "Unable to wrap token. The connected wallet does not own token."));
-eng_caption.push(new t_lang("UNWRAPPED_NOT_OWNER", "Unable to unwrap token. The connected wallet does not own token."));
-eng_caption.push(new t_lang("TOKEN_NOT_WRAPPED", "Unable to unwrap token. The selected token is not wrapped."));
-eng_caption.push(new t_lang("TOKEN_STOLEN", "The selected token may have been stolen."));
-eng_caption.push(new t_lang("NAMECHANGE_DISABLED", "Unable to change IPC's name. Marketplace has been disabled."));
-eng_caption.push(new t_lang("NAMECHANGE_NOT_OWNER", "Unable to change IPC's name. The connected wallet does not own token."));
-
-
-function lang_eng(id) {
-
-  const label = [
-
-    "TOKEN_NOT_WRAPPED", 
-  ];
-
-}
+const lang = context.getLang();
 
 function Row(props) {
 
@@ -308,12 +268,31 @@ function Gender(props) {
 
 function approvalEvent(ipc, update, setUpdate) {
 
+  const ipc_contract = context.ipc_contract;
+
   return async () => {
 
     if (ipc.pending == true)
       return;
 
-    // open dialog
+    const tx = await ipc_contract.approve(ipc.token_id);
+    if (tx.code == -1) {
+
+      context.openSnackbar(
+        "error",
+        lang.getCaption("MUST_BE_APPROVED"),
+        lang.getMessage("MUST_BE_APPROVED")
+      );    
+
+      return;
+    }
+
+    context.openSnackbar(
+      "pending",
+      lang.getCaption("APPROVAL_PENDING"),
+      lang.getMessage("APPROVAL_PENDING"),
+      "https://etherscan.io/tx/" + tx.payload
+    );    
 
     ipc.pending = true;
     setUpdate(++update);
@@ -337,6 +316,12 @@ function approvalEvent(ipc, update, setUpdate) {
         ipc.pending = false;
 	setUpdate(++update);
 
+        context.openSnackbar(
+          "success",
+          lang.getCaption("APPROVAL_OK"),
+          lang.getMessage("APPROVAL_OK")
+        );    
+
 	context.removeSubscriber(
           "approval",
           resourceId
@@ -355,15 +340,32 @@ function wrappedEvent(ipc, update, setUpdate) {
     if (ipc.pending == true)
       return;
 
-    // open dialog
+    if (await ipc_contract.isApprovedForAll() == false) {
+
+      if (await ipc_contract.isApproved(ipc.token_id) == false) {
+
+        ipc.approved = false;
+        ipc.wrapped = false;
+        ipc.pending = false;
+	setUpdate(++update);
+
+	context.openSnackbar(
+          "error",
+          lang.getCaption("TOKEN_NOT_APPROVED"),
+          lang.getMessage("TOKEN_NOT_APPROVED")
+        );    
+
+        return;
+      }
+    }
 
     const tx = await ipc_contract.wrap(ipc.token_id);
     if (tx.code == -1) {
 
       context.openSnackbar(
         "error",
-        tx.payload,
-        tx.payload
+        lang.getCaption(tx.payload),
+        lang.getMessage(tx.payload)
       );    
 
       return;
@@ -371,8 +373,8 @@ function wrappedEvent(ipc, update, setUpdate) {
 
     context.openSnackbar(
       "pending",
-      tx.payload,
-      tx.payload,
+      lang.getCaption("WRAP_PENDING"),
+      lang.getMessage("WRAP_PENDING"),
       "https://etherscan.io/tx/" + tx.payload
     );    
 
@@ -394,14 +396,13 @@ function wrappedEvent(ipc, update, setUpdate) {
 
         ipc.wrapped = true;
         ipc.pending = false;
+	setUpdate(++update);
 
         context.openSnackbar(
           "success",
-          "WRAPPED",
-          "WRAPPED"
+          lang.getCaption("WRAP_OK"),
+          lang.getMessage("WRAP_OK")
         );    
-
-	setUpdate(++update);
 
 	context.removeSubscriber(
           "wrapped",
@@ -421,11 +422,24 @@ function unwrappedEvent(ipc, update, setUpdate) {
     if (ipc.pending == true)
       return;
 
-    // open dialog
-
     const tx = await ipc_contract.unwrap(ipc.token_id);
-    if (tx.code == -1)
+    if (tx.code == -1) {
+
+      context.openSnackbar(
+        "error",
+        lang.getCaption(tx.payload),
+        lang.getMessage(tx.payload)
+      );  
+
       return;
+    }
+
+    context.openSnackbar(
+      "pending",
+      lang.getCaption("UNWRAP_PENDING"),
+      lang.getMessage("UNWRAP_PENDING"),
+      "https://etherscan.io/tx/" + tx.payload
+    );    
 
     ipc.pending = true;
     setUpdate(++update);
@@ -439,10 +453,6 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
         const [ eventId, tokenId, owner ] = payload;
 
-        console.log(eventId);
-        console.log(tokenId);
-        console.log(owner);
-
         if (eventId != "unwrapped" ||
           tokenId != ipc.token_id)
             return;
@@ -450,8 +460,13 @@ function unwrappedEvent(ipc, update, setUpdate) {
         ipc.approved = true;
         ipc.wrapped = false;
         ipc.pending = false;
-
 	setUpdate(++update);
+
+        context.openSnackbar(
+          "success",
+          lang.getCaption("UNWRAP_OK"),
+          lang.getMessage("UNWRAP_OK")
+        );    
 
 	context.removeSubscriber(
           "unwrapped",

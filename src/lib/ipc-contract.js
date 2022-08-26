@@ -277,12 +277,53 @@ class t_ipc_contract extends t_subscriptions {
     return ipc;
   }
 
-  // need to listen for approveal for all mode set to update all buttons.
+  async isApprovedForAll() {
+
+    if (this.defaultProvider == null)
+      return false;
+
+    if (this.provider == null)
+      return false;
+
+    const signer = this.provider.getSigner();
+
+    const sourceContract = new ethers.Contract(
+      this.sourceAddress, sourceABI, this.defaultProvider);
+
+    const approvedForAll = await sourceContract
+      .isApprovedForAll(
+        signer.address,
+	this.wrapperAddress)
+      .catch(error => false);
+
+    return approvedForAll;
+  }
+
+  async isApproved(tokenId) {
+
+    if (this.defaultProvider == null)
+      return false;
+
+    if (this.provider == null)
+      return false;
+
+    const signer = this.provider.getSigner();
+
+    const sourceContract = new ethers.Contract(
+      this.sourceAddress, sourceABI, this.defaultProvider);
+
+    const approvedAddress = await sourceContract
+      .getApproved(tokenId)
+      .catch(error => {   console.log(error);  return "";  } );
+
+    const approved = this.wrapperAddress == approvedAddress ? true : false;
+    return approved;
+  }
 
   async setApprovalForAll(tokenId) {
 
     if (this.provider == null)
-      return false;
+      return { code: -1, payload: "NOT_CONNECTED" };
     
     const signer = this.provider.getSigner();
 
@@ -300,9 +341,31 @@ class t_ipc_contract extends t_subscriptions {
     return true;
   }
 
+  async approve(tokenId) {
+
+    console.log(this.provider);
+
+    if (this.provider == null)
+      return { code: -1, payload: "NOT_CONNECTED" };
+    
+    const signer = this.provider.getSigner();
+
+    const tx = await this.sourceContract
+      .connect(signer)
+      .approve(this.wrapperAddress, tokenId)
+      .catch((error) => {
+	      console.log(error);
+        return { code: -1, payload: parseTx(error) };
+      });
+
+    if (typeof tx.code == "undefined")
+      return { code: 0, payload: parseTx(tx) };
+
+    return tx;
+  }
+
   async wrap(tokenId) {
 
-    // fix this....
     if (this.provider == null)
       return { code: -1, payload: "NOT_CONNECTED" };
     
@@ -315,8 +378,6 @@ class t_ipc_contract extends t_subscriptions {
         return { code: -1, payload: parseTx(error) };
       });
 
-    console.log(tx);
-
     if (typeof tx.code == "undefined")
       return { code: 0, payload: parseTx(tx) };
 
@@ -326,18 +387,23 @@ class t_ipc_contract extends t_subscriptions {
   async unwrap(tokenId) {
 
     if (this.provider == null)
-      return false;
+      return { code: -1, payload: "NOT_CONNECTED" };
     
     const signer = this.provider.getSigner();
 
     const tx = await this.wrapperContract
       .connect(signer)
       .unwrap(tokenId)
-      .catch((error) => {   console.log(error);      return false;  } );
+      .catch((error) => {
 
-    return tx == false ? false : tx;
+        return { code: -1, payload: parseTx(error) };
+      });
+
+    if (typeof tx.code == "undefined")
+      return { code: 0, payload: parseTx(tx) };
+
+    return tx;
   }
-
 }
 
 export function createIPCContract() {

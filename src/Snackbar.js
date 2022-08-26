@@ -28,7 +28,6 @@ function openSnackbar(
 
         return () => {
 
-          console.log("test");
           window.open(link);
           closeSnackbar();
         }

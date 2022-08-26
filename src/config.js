@@ -1,7 +1,13 @@
+import { createEngLang } from "./lang";
+
 class t_config {
 
   providerURI;
-  maxOwnerTotal;
+  defaultChainId;
+  sourceContract;
+  wrapperContract;
+  loadSegmentSize;
+  lang;
 
   constructor() {
 
@@ -11,8 +17,8 @@ class t_config {
 
       this.providerURI = "http://127.0.0.1:8545";
       this.defaultChainId = "0x29a";
-      this.sourceContract = "0x09182dCd75c5e9f301039B5c43B21f44391c1804";
-      this.wrapperContract = "0xA09eBAd369110568F6592Ad8Fc30F01bD0a7b833";
+      this.sourceContract = "0x0B0D1b85d526760E29b771268bB90e2e5cCd30a8";
+      this.wrapperContract = "0xf68c5E6605e9EF0F1E2B46890261A28B60E0E8b8";
     }
     else {
 
@@ -23,6 +29,7 @@ class t_config {
     }
 
     this.loadSegmentSize = 50;
+    this.lang = createEngLang();
   }
 };
 
