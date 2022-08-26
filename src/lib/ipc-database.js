@@ -93,6 +93,9 @@ class t_ipc_database extends t_subscriptions {
     let token = null;
     for (let index = 0; index < tokenIdList.length; index++) {
 
+      if (tokenIdList[index] <= 0)
+        continue;
+
       let token = this.database[tokenIdList[index] - 1];
 
       token.approved = approved;
@@ -144,6 +147,9 @@ class t_ipc_database extends t_subscriptions {
 
     let token = null;
     for (let index = 0; index < tokenIdList.length; index++) {
+
+      if (tokenIdList[index] <= 0)
+        continue;
 
       let token = this.database[tokenIdList[index] - 1];
 

@@ -127,8 +127,6 @@ class t_ipc_contract extends t_subscriptions {
     this.createSubscription("approvalForAll");
     this.createSubscription("wrapped");
     this.createSubscription("unwrapped");
-
-    // this.wrap(0);
   }
 
   connect() {
@@ -320,30 +318,27 @@ class t_ipc_contract extends t_subscriptions {
     return approved;
   }
 
-  async setApprovalForAll(tokenId) {
+  async setApprovalForAll(enabled) {
 
     if (this.provider == null)
       return { code: -1, payload: "NOT_CONNECTED" };
     
     const signer = this.provider.getSigner();
 
-    // old contract here....
     const tx = await this.sourceContract
       .connect(signer)
-      .approve(this.wrapperAddress, tokenId)
-        .catch((error) => {
-          console.log(error);
-          return false;
-        });
+      .setApprovalForAll(this.wrapperAddress, enabled)
+      .catch((error) => {
+        return { code: -1, payload: parseTx(error) };
+      });
 
-    console.log(tx);
+    if (typeof tx.code == "undefined")
+      return { code: 0, payload: parseTx(tx) };
 
-    return true;
+    return tx;
   }
 
   async approve(tokenId) {
-
-    console.log(this.provider);
 
     if (this.provider == null)
       return { code: -1, payload: "NOT_CONNECTED" };
@@ -354,7 +349,6 @@ class t_ipc_contract extends t_subscriptions {
       .connect(signer)
       .approve(this.wrapperAddress, tokenId)
       .catch((error) => {
-	      console.log(error);
         return { code: -1, payload: parseTx(error) };
       });
 

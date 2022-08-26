@@ -15,6 +15,7 @@ import { SelectMenu } from "./SelectMenu";
 
 import ArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import ConstructionIcon from '@mui/icons-material/Construction';
 
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
@@ -22,6 +23,7 @@ import { SnackbarSubscriber } from "./Snackbar";
 
 const context = getContext();
 const theme = context.getTheme();
+const lang = context.getLang();
 
 function CardContainer(props) {
 
@@ -187,6 +189,130 @@ function WrapBlank(props) {
   );
 }
 
+function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
+
+  const ipc_contract = context.ipc_contract;
+
+  return async () => {
+
+    if (approvalForAll == "pending")
+      return;
+
+    const enabled = approvalForAll == "enabled" ? false : true;
+
+    const tx = await ipc_contract.setApprovalForAll(enabled);
+    if (tx.code == -1) {
+
+      context.openSnackbar(
+        "error",
+        lang.getCaption("MUST_BE_APPROVED"),
+        lang.getMessage("MUST_BE_APPROVED")
+      );    
+
+      return;
+    }
+
+    context.openSnackbar(
+      "pending",
+      lang.getCaption("APPROVAL_PENDING"),
+      lang.getMessage("APPROVAL_PENDING"),
+      "https://etherscan.io/tx/" + tx.payload
+    );    
+
+    setApprovalForAll("pending");
+
+    context.addSubscriber(
+      "approvalForAll",
+      "approvalForAll",
+      (payload) => {
+
+        const [ eventId, owner, operator, approved ] = payload;
+
+        if (eventId != "approvalForAll")
+          return;
+
+        if (approved)
+          setApprovalForAll("enabled");
+        else
+          setApprovalForAll("disabled");
+
+        context.openSnackbar(
+          "success",
+          lang.getCaption("APPROVAL_OK"),
+          lang.getMessage("APPROVAL_OK")
+        );    
+
+	context.removeSubscriber(
+          "approvalForAll",
+          "approvalForAll"
+        );
+      } 
+    );
+  };
+}
+
+
+
+function WrapControlPanel() {
+
+  const [ approvalForAll, setApprovalForAll ] = React.useState("disabled");
+
+  // use effect to get current status of approval for all.
+
+  const CardBody = styled(Box)({
+
+    display: "flex",
+    flexDirection: "column"
+  });
+
+  const Row = styled(Box)({
+
+    display: "flex",
+    flexDirection: "row",
+    padding: "16px"
+  });
+
+  const PendingButton = styled(Button)({
+
+    margin: "8px 16px 8px 0",
+    fontSize: "12px"
+  });
+
+  const approvalForAllLabel = ((state) => {
+
+    switch (approvalForAll) {
+
+      case "enabled": return "Enabled";
+      case "disabled": return "Disabled";
+      default: return "Pending";
+    }
+
+  })(approvalForAll);
+
+  return (
+    <Card
+      icon={ <ConstructionIcon /> }
+      title="Wrapper Configuration"
+      subtitle=""
+    >
+      <CardBody>
+        <Row> 
+          <Box>
+            <Box>Approval All Tokens</Box>
+            <Box>...</Box>
+	  </Box>
+          <Box sx={{ flex: 1, textAlign: "right" } }>
+            <PendingButton variant="contained" onClick={ setApprovalForAllEvent(approvalForAll, setApprovalForAll) }>
+	      { approvalForAllLabel }
+	    </PendingButton>
+	  </Box>
+	</Row>
+      </CardBody>
+    </Card>
+  );
+}
+
+
 export function WrapPanel(props) {
 
   const ipc_database = context.ipc_database;
@@ -255,8 +381,6 @@ export function WrapPanel(props) {
     textAlign: "right"
   });
 
- // add delay to button for proper animation.
-
   const updateRowsPerPage = (event) => {
 
     wrap_panel.rowsPerPage = event.target.value;
@@ -303,6 +427,8 @@ export function WrapPanel(props) {
   return (
 
     <CardContainer show={ visible }>
+
+    <WrapControlPanel />
 
     <Card
       icon={ wrapped ? <LockIcon /> : <LockOpenIcon /> }
