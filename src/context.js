@@ -112,11 +112,11 @@ export class t_context extends t_subscriptions {
       this.hideBackdrop();
   }
 
-  openSnackbar(type, caption, content) {
+  openSnackbar(type, caption, content, link) {
 
     context.processSubscription(
       "openSnackbar",
-      [ type, caption, content ]
+      [ type, caption, content, link ]
     );
   }
 

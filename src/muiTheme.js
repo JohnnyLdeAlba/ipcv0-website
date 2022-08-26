@@ -9,6 +9,7 @@ const muiTheme = createTheme({
 
     primary: { main: theme.primaryColor },
     secondary: { main: theme.secondaryColor },
+    circularProgress: { main: theme.circularProgress },
     background: { default: theme.backgroundColor }
   }
 });

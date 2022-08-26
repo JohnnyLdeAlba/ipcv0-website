@@ -18,6 +18,47 @@ import { getContext } from "./context";
 const context = getContext();
 const theme = context.getTheme();
 
+class t_lang {
+
+  key;
+  value;
+
+  constructor() {
+
+    key = "";
+    value = "";
+  }
+
+  set(key, value) {
+
+    this.key = key;
+    this.value = value;
+  }
+}
+
+const eng_caption = [];
+
+eng_caption.push(new t_lang("APPROVAL_FOR_ALL_NOT_OWNER", "Unable to set approval for all. The connected wallet does not have authorization."));
+eng_caption.push(new t_lang("APPROVAL_NOT_OWNER", "Unable to approve token. The connected wallet does not own token."));
+eng_caption.push(new t_lang("TOKEN_LIMIT_REACHED", "Unable to wrap token. The token limit has been reached."));
+eng_caption.push(new t_lang("TOKEN_ALREADY_WRAPPED", "The selected token has already been wrapped."));
+eng_caption.push(new t_lang("WRAPPED_NOT_OWNER", "Unable to wrap token. The connected wallet does not own token."));
+eng_caption.push(new t_lang("UNWRAPPED_NOT_OWNER", "Unable to unwrap token. The connected wallet does not own token."));
+eng_caption.push(new t_lang("TOKEN_NOT_WRAPPED", "Unable to unwrap token. The selected token is not wrapped."));
+eng_caption.push(new t_lang("TOKEN_STOLEN", "The selected token may have been stolen."));
+eng_caption.push(new t_lang("NAMECHANGE_DISABLED", "Unable to change IPC's name. Marketplace has been disabled."));
+eng_caption.push(new t_lang("NAMECHANGE_NOT_OWNER", "Unable to change IPC's name. The connected wallet does not own token."));
+
+
+function lang_eng(id) {
+
+  const label = [
+
+    "TOKEN_NOT_WRAPPED", 
+  ];
+
+}
+
 function Row(props) {
 
   const Row = styled(Box)({
@@ -331,7 +372,8 @@ function wrappedEvent(ipc, update, setUpdate) {
     context.openSnackbar(
       "pending",
       tx.payload,
-      tx.payload
+      tx.payload,
+      "https://etherscan.io/tx/" + tx.payload
     );    
 
     ipc.pending = true;

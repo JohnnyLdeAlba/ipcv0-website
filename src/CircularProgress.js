@@ -37,9 +37,9 @@ export function CircularProgress(props) {
     >
       <MUICircularProgress
         variant="indeterminate"
-	size="40px"
-	thickness=""
-	color="secondary"
+	size={ 60 }
+	thickness={ 6 }
+	color="circularProgress"
       />
     </MUIBackdrop>
   );

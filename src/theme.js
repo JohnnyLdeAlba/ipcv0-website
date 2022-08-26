@@ -17,6 +17,7 @@ const theme = {
   selectHighlightColor: "#666b74",
   selectedColor: "#010409", 
   snackbarColor: "#161b22",
+  circularProgress: "#8597aa", 
   backdropTransition: 500,
   backdropzIndex: 9999,
 }

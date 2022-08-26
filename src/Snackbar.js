@@ -16,13 +16,24 @@ function openSnackbar(
   enqueueSnackbar,
   closeSnackbar) {
 
-  const close = () => {
-    closeSnackbar();
-  };
-
   return (payload) => {
 
-    const [ type, caption, content ] = payload;
+    const [ type, caption, content, link ] = payload;
+
+    const close = ((link) => {
+
+      if (typeof link == "undefined")
+        return () => { closeSnackbar(); };
+      else {
+
+        return () => {
+
+          console.log("test");
+          window.open(link);
+          closeSnackbar();
+        }
+      }	
+    })(link);
 
     enqueueSnackbar(
       content,
