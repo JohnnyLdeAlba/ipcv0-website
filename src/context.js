@@ -112,6 +112,14 @@ export class t_context extends t_subscriptions {
       this.hideBackdrop();
   }
 
+  openSnackbar(type, caption, content) {
+
+    context.processSubscription(
+      "openSnackbar",
+      [ type, caption, content ]
+    );
+  }
+
   async delay() {
     return new Promise(resolve => setTimeout(resolve, 500));
   }

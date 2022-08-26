@@ -16,6 +16,7 @@ const theme = {
   selectColor: "#161b22",
   selectHighlightColor: "#666b74",
   selectedColor: "#010409", 
+  snackbarColor: "#161b22",
   backdropTransition: 500,
   backdropzIndex: 9999,
 }

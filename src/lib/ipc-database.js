@@ -65,10 +65,10 @@ class t_ipc_database extends t_subscriptions {
     if (this.ownersBalance == -1) {
 
       const balance = await this.ipc_contract.uwBalanceOf(owner);
+      this.ownersBalance = balance;
+
       if (balance == 0)
         return -1;
- 
-      this.ownersBalance = balance;
     }
 
     const segmentTotalTokens = this.segmentTotalTokens();
@@ -117,10 +117,10 @@ class t_ipc_database extends t_subscriptions {
     if (this.ownersBalance == -1) {
 
       const balance = await this.ipc_contract.wBalanceOf(owner);
+      this.ownersBalance = balance;
+
       if (balance == 0)
         return -1;
- 
-      this.ownersBalance = balance;
     }
 
     const segmentTotalTokens = this.segmentTotalTokens();

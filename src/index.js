@@ -20,7 +20,7 @@ import MUICircularProgress from "@mui/material/CircularProgress";
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-
+import { SnackbarProvider } from "notistack";
 import { Header } from "./Header";
 import { Backdrop } from "./Backdrop";
 import { Card } from "./Card";
@@ -34,6 +34,7 @@ import ArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
+import { SnackbarSubscriber } from "./Snackbar";
 
 import "./style.css";
 
@@ -90,7 +91,9 @@ function WrapEffect(payload) {
 
   const [
     wrap_dialog,
-    setWrapDialog
+    setWrapDialog,
+    enqueueSnackbar,
+    
   ] = payload
 
   const ipc_database = context.ipc_database;
@@ -106,6 +109,7 @@ function WrapEffect(payload) {
     if (ipc_database.ownersTokens == null) {
 
       wrap_dialog.visible = true;
+
       context.processSubscription(
         "updateWrapPanel",
 	[ wrap_dialog ]
@@ -396,8 +400,6 @@ function CircularEffect(context, show) {
   }
 }
 
-
-
 function CircularProgress(props) {
 
   const [ visible, show ] = React.useState(false);
@@ -422,7 +424,7 @@ function CircularProgress(props) {
 
 function Layout(props) {
 
-  const _Layout = styled(Box)({
+  const Layout = styled(Box)({
 
     height: "100vh",
     overflow: "auto",
@@ -434,20 +436,22 @@ function Layout(props) {
   return (<>
     <CssBaseline />
     <ThemeProvider theme={ muiTheme }>
+    <SnackbarProvider maxSnack={ 4 }>
       <Backdrop>
         <ConnectDialog /> 
         <AccountDialog />
         <CircularProgress />
       </Backdrop>
-      <_Layout>
+      <SnackbarSubscriber />
+      <Layout>
         <Header />
 	<WrapDialog />
         { props.children }
-      </_Layout>
+      </Layout>
+    </SnackbarProvider>
     </ThemeProvider>
   </>);
 }
-
 
 async function main() {
 
