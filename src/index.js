@@ -123,6 +123,7 @@ function WrapEffect(payload) {
       context.showCircular(true);
 
       ipc_database.requestOwnersTokens(
+        // "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
         "0xE185e4A8e4E5A73B5899fb20Cd73f7Af5AEa8440",
         (wrap_dialog.page + 1) * wrap_dialog.rowsPerPage,
         wrap_dialog.wrapped,
@@ -266,10 +267,19 @@ function WrapDialog(props) {
 
   const Pagination = styled(Box)({
 
-    display: "flex",
+    display: "block",
     flexDirection: "row",
     alignItems: "center",
-    padding: "8px 16px 0 16px"
+    padding: "8px 16px 0 16px",
+
+    "@media (min-width: 530px)": {
+      display: "flex"
+    }
+  });
+
+  const PageSelect = styled(Box)({
+    display: "flex",
+    flexDirection: "row"
   });
 
   const PageControl = styled(Box)({
@@ -283,6 +293,7 @@ function WrapDialog(props) {
   // add NO IPCs view!
  // hide pages
  // add delay to button for proper animation.
+// hide rows per page and wrap
 
   const updateRowsPerPage = (event) => {
 
@@ -346,6 +357,7 @@ function WrapDialog(props) {
 
         <Pagination>
 
+	  <PageSelect>
 	  <SelectMenu
 	    id="wrappedSelect"
 	    label="Show"
@@ -369,6 +381,7 @@ function WrapDialog(props) {
 	    ]}
 	    onChange={ updateRowsPerPage }
 	    width="140px" />
+          </PageSelect>
 
           <PageControl>
 	    Page { page + 1 } of { totalPages }

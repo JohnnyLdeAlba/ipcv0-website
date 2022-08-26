@@ -317,10 +317,22 @@ function wrappedEvent(ipc, update, setUpdate) {
     // open dialog
 
     const tx = await ipc_contract.wrap(ipc.token_id);
-    if (tx == false)
-      return;
+    if (tx.code == -1) {
 
-    console.log(tx);
+      context.openSnackbar(
+        "error",
+        tx.payload,
+        tx.payload
+      );    
+
+      return;
+    }
+
+    context.openSnackbar(
+      "pending",
+      tx.payload,
+      tx.payload
+    );    
 
     ipc.pending = true;
     setUpdate(++update);
@@ -338,10 +350,14 @@ function wrappedEvent(ipc, update, setUpdate) {
           tokenId != ipc.token_id)
             return;
 
-        console.log(tokenId);
-
         ipc.wrapped = true;
         ipc.pending = false;
+
+        context.openSnackbar(
+          "success",
+          "WRAPPED",
+          "WRAPPED"
+        );    
 
 	setUpdate(++update);
 
@@ -366,10 +382,8 @@ function unwrappedEvent(ipc, update, setUpdate) {
     // open dialog
 
     const tx = await ipc_contract.unwrap(ipc.token_id);
-    if (tx == false)
+    if (tx.code == -1)
       return;
-
-    console.log(tx);
 
     ipc.pending = true;
     setUpdate(++update);

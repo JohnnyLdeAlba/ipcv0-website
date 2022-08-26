@@ -18,8 +18,8 @@ class t_config {
 
       this.providerURI = "https://eth-mainnet.g.alchemy.com/v2/SYJS-Zaeo1W7JJNFsV8-ZeUJigU5VyNk";
       this.defaultChainId = "0x1";
-      this.sourceContract = "0x0721F63742158BEAE948c3C406b59d7b22C38A3b";
-      this.wrapperContract = "0xc18a45985660C78309bbAA9908D21d47F24d66F3";
+      this.sourceContract = "0x4787993750B897fBA6aAd9e7328FC4F5C126e17c";
+      this.wrapperContract = "0x2Ebc386D7E6Ef1Af0EdcF2ED1c8E91f8f8A79Fe3";
     }
 
     this.loadSegmentSize = 50;

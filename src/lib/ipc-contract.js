@@ -8,6 +8,26 @@ import { getConfig } from "../config";
 
 const config = getConfig();
 
+function parseTx(tx) {
+
+  if (typeof tx == "object")
+    tx = JSON.stringify(tx);
+
+  let match = tx.match(/\"hash\": ?\"(0x[A-Fa-f0-9]*)\"/);
+  if (match != null)
+    return match[1];
+
+  match = tx.match(/revert:? ([A-Z0-9_]*)/);
+  if (match != null)
+    return match[1];
+
+  match = tx.match(/reverted:? ([A-Z0-9_]*)/);
+  if (match != null)
+    return match[1];
+
+  return null;
+}
+
 function approvalEvent(ipc_contract) {
 
   return (owner, approved, tokenId) => {
@@ -281,20 +301,26 @@ class t_ipc_contract extends t_subscriptions {
   }
 
   async wrap(tokenId) {
-   
+
+    // fix this....
     if (this.provider == null)
-      return false;
+      return { code: -1, payload: "NOT_CONNECTED" };
     
     const signer = this.provider.getSigner();
 
     const tx = await this.wrapperContract
       .connect(signer)
       .wrap(tokenId)
-      .catch(error => false);
+      .catch((error) => {
+        return { code: -1, payload: parseTx(error) };
+      });
 
-    // Need to handle errors right.
+    console.log(tx);
 
-    return tx == false ? false : tx;
+    if (typeof tx.code == "undefined")
+      return { code: 0, payload: parseTx(tx) };
+
+    return tx;
   }
 
   async unwrap(tokenId) {
@@ -307,7 +333,7 @@ class t_ipc_contract extends t_subscriptions {
     const tx = await this.wrapperContract
       .connect(signer)
       .unwrap(tokenId)
-      .catch(error => false);
+      .catch((error) => {   console.log(error);      return false;  } );
 
     return tx == false ? false : tx;
   }

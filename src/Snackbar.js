@@ -77,7 +77,7 @@ function SnackbarIcon(props) {
       return <CancelIcon
         sx={{ fontSize: "38px" }} />;
 
-    case "processing":
+    case "pending":
 
       return <CachedIcon
         sx={{ fontSize: "38px" }} />;
@@ -98,7 +98,7 @@ const Snackbar = React.forwardRef((props, ref) => {
       case "error":
 	return "#cc3333";
 
-      case "processing":
+      case "pending":
 	return "#4488ff";
 
       default:
