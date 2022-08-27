@@ -1,0 +1,141 @@
+import React from "react";
+import { styled } from '@mui/material/styles';
+import { useLocation } from "react-router-dom";
+
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+
+import { Card } from "./Card";
+import { SelectMenu } from "./SelectMenu";
+import { getContext } from "./context";
+
+const context = getContext();
+const theme = context.getTheme();
+const lang = context.getLang();
+
+class t_explorer {
+
+  mounted;
+
+  constructor() {
+
+    this.mounted = false;
+  }
+}
+
+function Container(props) {
+
+  const display = typeof props.show == "undefined" ||
+    props.show == false ? "none" : "block";
+
+  const Container = styled(Box)({
+
+    display: display,
+    margin: "24px auto",
+    width: "100%",
+
+    "@media (min-width: 900px)": {
+      width: "875px"
+    }
+  });
+
+  return (<Container>{ props.children }</Container>);
+}
+
+function Image(props) {
+
+  const Image = styled('img')({
+    imageRendering: "pixelated",
+    width: "160px",
+    height: "160px"
+  });
+
+  const url = `/gif/${props.tokenId}.gif`;
+
+  return <Image src={ url } />;
+}
+
+function Row(props) {
+
+  const Row = styled(Box)({
+
+    display: "flex",
+    flexDirection: "row",
+    padding: "24px"
+  });
+
+  return (
+    <Row>{ props.children }</Row>
+  );
+}
+
+function AttributeBox(props) {
+
+  const AttributeBox = styled(Box)({
+
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100px",
+    height: "100px",
+    borderRadius: "8px",
+    backgroundColor: theme.cardTitleColor,
+    fontFamily: "poppins-semibold",
+    fontSize: "40px",
+    fontWeight: "bold"
+  });
+
+  const Label = styled(Box)({
+
+    position: "relative",
+    fontSize: "16px",
+    fontWeight: "bold"
+  });
+
+  return (
+    <AttributeBox>
+      <Label>{ props.label }</Label>
+      { props.value }
+    </AttributeBox>
+  );
+}
+
+export function Explorer(props) {
+
+  const ipc_database = context.ipc_database;
+  const explorer = React.useState(new t_explorer);
+  const location = useLocation();
+
+  const match = location.pathname.match(/\/([0-9]+)/);
+
+  const tokenId = ((match) => {
+
+    return match == null ? 0 : match[1];
+  })(match);
+
+  if (tokenId > 0)
+    explorer.mounted = true;
+
+  const ipc = ipc_database.getIpc(tokenId);
+	 
+  const title = `${ipc.token_id} - ${ipc.gender}`;
+  const subtitle = `${ipc.subrace}`;
+
+  return (
+    <Container show={ explorer.mounted }>
+    <Card
+      icon= { <AccountBoxIcon /> }
+      title={ title }
+      subtitle={ subtitle }
+    >
+      <Row>
+        <Image tokenId={ tokenId } />
+	<AttributeBox title="Strength" value={ ipc.strength } />
+      </Row>
+    </Card>
+    </Container>
+  );
+}

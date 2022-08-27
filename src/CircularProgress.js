@@ -26,7 +26,7 @@ function effectFactory(context, show) {
 
 export function CircularProgress(props) {
 
-  const [ visible, show ] = React.useState(true);
+  const [ visible, show ] = React.useState(false);
   React.useEffect(effectFactory(context, show));
 
   return (

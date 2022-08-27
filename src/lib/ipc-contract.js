@@ -298,6 +298,9 @@ class t_ipc_contract extends t_subscriptions {
       this.sourceAddress, sourceABI, this.defaultProvider);
 
     const accountDetails = this.mwc_provider.getAccountDetails();
+    if (accountDetails.account == null)
+      return false;
+
     const approvedAddress = await sourceContract
       .isApprovedForAll(accountDetails.account, this.wrapperAddress)
       .catch(error => {  console.log(error); return false; } );

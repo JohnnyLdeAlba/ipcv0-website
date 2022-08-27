@@ -14,7 +14,7 @@ const theme = context.getTheme();
 
 function Logo() {
 
-  const _Link = styled(Link)({ display: "block" });
+  const RLink = styled(Link)({ display: "block" });
 
   const Image = styled('img')({
 
@@ -29,15 +29,15 @@ function Logo() {
   });
 
   return (
-    <_Link href="./">
+    <RLink href="/">
       <Image src="assets/ipcv0-small.svg" />
-    </_Link>
+    </RLink>
   );
 }
 
 function IOLogo() {
 
-  const _Link = styled(Link)({
+  const RLink = styled(Link)({
 
     display: "none",
 
@@ -56,9 +56,9 @@ function IOLogo() {
   });
 
   return (
-    <_Link href="/">
+    <RLink href="/">
       <Image src="assets/ipcv0-io.svg" />
-    </_Link>
+    </RLink>
   );
 }
 
@@ -241,8 +241,12 @@ export function Header(props) {
       <MenuRow>
         <Container>
 	  <Menu>
-	    <MenuItem>About</MenuItem>
-	    <MenuItem>Wrap/Unwrap IPCs</MenuItem>
+            <MenuItem>About</MenuItem>
+            <MenuItem>
+              <Link href="/wrap-unwrap">
+                Wrap/Unwrap IPCs
+              </Link> 
+            </MenuItem>
 	    <ConnectMenuItem />
           </Menu>
 	</Container>

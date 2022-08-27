@@ -176,7 +176,12 @@ class t_multi_wallet_connect extends t_subscriptions {
     else if (this.wc_provider.isConnected())
       return this.wc_provider.getAccountDetails(f);
 
-    return false;
+    return {
+
+      providerName: null,
+      chainId: null,
+      account: null
+    }
   }
 }
 

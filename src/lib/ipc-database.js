@@ -80,7 +80,7 @@ class t_ipc_database extends t_subscriptions {
     const tokenIdList = await this.ipc_contract
       .uwGetOwnersTokenIdList(
         owner,
-	this.segment,
+	this.segment * this.segmentSize,
 	this.segmentSize
     );
 
@@ -135,7 +135,7 @@ class t_ipc_database extends t_subscriptions {
     const tokenIdList = await this.ipc_contract
       .wGetOwnersTokenIdList(
         owner,
-	this.segment,
+	this.segment * this.segmentSize,
 	this.segmentSize
     );
 
@@ -172,6 +172,8 @@ class t_ipc_database extends t_subscriptions {
     return (this.segment * this.segmentSize) + this.segmentSize;
   }
 
+
+  // fix!!! dynamic loader doesn't work right!
   async requestOwnersTokens(owner, requestedTotalTokens, wrapped, approved) {
 
     wrapped = typeof wrapped == "undefined" ||
@@ -262,6 +264,14 @@ class t_ipc_database extends t_subscriptions {
 
     ownersTokens.sort(sortBy);
     return ownersTokens;
+  }
+
+  getIpc(tokenId) {
+
+    if (tokenId <= 0 || tokenId > this.database.length)
+      return new IPCLib.t_label_ipc;
+
+    return this.database[tokenId - 1];
   }
 }
 

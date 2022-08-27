@@ -714,7 +714,7 @@ export function WrapRow(props) {
 	  show={ ipc.wrapped }
 	  pending={ ipc.pending }
 	  onClick={ unwrappedEvent(ipc, update, setUpdate) }>
-	    Uwrap
+	    Unwrap
 	</PendingButton>
 
       </Action>

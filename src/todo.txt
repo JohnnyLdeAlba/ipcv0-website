@@ -1,0 +1,3 @@
+* Need to update login credentials when switching wallets in MetaMask.
+* Need to create a persistent state for Contract events, so unmounted components can react.
+* Need to be able to unmount WrapRow's and requery IPC button states, performing a refresh kills the state.

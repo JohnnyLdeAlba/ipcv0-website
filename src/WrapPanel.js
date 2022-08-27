@@ -1,5 +1,6 @@
 import React from "react";
 import { styled } from '@mui/material/styles';
+import { useLocation } from "react-router-dom";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -69,33 +70,46 @@ function wrapEffect(payload) {
 
   return () => {
 
+    context.addSubscriber("connect", "wrapPanel", (payload) => {
+
+      context.processSubscription(
+        "updateWrapPanel",
+	[ wrap_panel ]
+      );
+    });
+
+    context.addSubscriber("updateSession", "wrapPanel", (payload) => {
+
+      context.processSubscription(
+        "updateWrapPanel",
+	[ wrap_panel ]
+      );
+    });
+
+    context.addSubscriber("disconnect", "wrapPanel", (payload) => {
+
+      wrap_panel.visible = false;
+      setWrapPanel(wrap_panel.clone());
+    });
+
     context.addSubscriber("sortWrapPanel", "wrapPanel", (payload) => {
 
       const [ wrap_panel ] = payload;
       setWrapPanel(wrap_panel.clone());
     });
 
-    if (ipc_database.ownersTokens == null) {
-
-      wrap_panel.update();
-
-      context.processSubscription(
-        "updateWrapPanel",
-	[ wrap_panel ]
-      );
-    }
-
     context.addSubscriber("updateWrapPanel", "wrapPanel", (payload) => {
 
-      const [ wrap_panel ] = payload;
-
       const accountDetails = context.getAccountDetails();
+	     
+      if (wrap_panel.mounted == false)
+        return;
+
+      if (accountDetails.account == null)
+        return;
 
       context.showCircular(true);
-
       ipc_database.requestOwnersTokens(
-        // "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
-        // "0xE185e4A8e4E5A73B5899fb20Cd73f7Af5AEa8440",
 	accountDetails.account,
         (wrap_panel.page + 1) * wrap_panel.rowsPerPage,
         wrap_panel.wrapped,
@@ -103,6 +117,10 @@ function wrapEffect(payload) {
       ).then(() => {
 
 	context.showCircular(false);
+
+        wrap_panel.visible = true;
+        wrap_panel.update();
+
         setWrapPanel(wrap_panel.clone());
       });
 
@@ -110,17 +128,6 @@ function wrapEffect(payload) {
 
     if (ipc_database.ownersBalance == -1) {
 
-      const accountDetails = context.getAccountDetails();
-      console.log(accountDetails);
-      if (accountDetails == false) {
-
-	ipc_database.ownersBalance = 0;
-        wrap_panel.visible = false;
-        setWrapPanel(wrap_panel.clone());
-	return;
-      }
-
-      wrap_panel.visible = false;
       context.processSubscription(
         "updateWrapPanel",
 	[ wrap_panel ]
@@ -129,6 +136,9 @@ function wrapEffect(payload) {
 
     return () => {
 
+      context.removeSubscriber("connect", "wrapPanel");
+      context.removeSubscriber("updateSession", "wrapPanel");
+      context.removeSubscriber("disconnect", "wrapPanel");
       context.removeSubscriber("sortWrapPanel", "wrapPanel");
       context.removeSubscriber("updateWrapPanel", "wrapPanel");
     }
@@ -151,6 +161,7 @@ function changePage(wrap_panel, nextPage) {
 class t_wrap_panel {
 
   serial;
+  mounted;
   visible;
   wrapped;
   sortBy;
@@ -161,6 +172,7 @@ class t_wrap_panel {
   constructor() {
 
     this.serial = 0;
+    this.mounted = false;
     this.visible = false;
     this.wrapped = false;
     this.sortBy = "tokenId";
@@ -174,6 +186,7 @@ class t_wrap_panel {
     const wrap_panel = new t_wrap_panel;
 
     wrap_panel.serial = this.serial;
+    wrap_panel.mounted = this.mounted;
     wrap_panel.visible = this.visible;
     wrap_panel.wrapped = this.wrapped;
     wrap_panel.sortBy = this.sortBy;
@@ -412,7 +425,7 @@ function WrapConfig(props) {
 
     display: "flex",
     flexDirection: "row",
-    padding: "16px"
+    padding: "24px"
   });
 
   const Title = styled(Box)({
@@ -483,8 +496,14 @@ function WrapConfig(props) {
 
 export function WrapPanel(props) {
 
+  const location = useLocation();
+
   const ipc_database = context.ipc_database;
   const [ wrap_panel, setWrapPanel ] = React.useState(new t_wrap_panel);
+
+  //needs to be fixed to make wrap panel independant from other components
+  if (location.pathname == "/wrap-unwrap")
+    wrap_panel.mounted = true;
 
   const visible = wrap_panel.visible;
   const wrapped = wrap_panel.wrapped;
@@ -593,7 +612,6 @@ export function WrapPanel(props) {
   };
 
   return (
-
     <CardContainer show={ visible }>
 
     <WrapConfig controller={ wrap_panel } />

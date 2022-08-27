@@ -17,6 +17,7 @@ import { CircularProgress } from "./CircularProgress";
 import { getContext } from "./context";
 import { getMUITheme } from "./muiTheme";
 import { SnackbarSubscriber } from "./Snackbar";
+import { Explorer } from "./Explorer";
 import { WrapPanel } from "./WrapPanel";
 
 import "./style.css";
@@ -48,6 +49,7 @@ function Layout(props) {
       <SnackbarSubscriber />
       <Layout>
         <Header />
+	<Explorer />
 	<WrapPanel />
         { props.children }
       </Layout>
@@ -67,6 +69,8 @@ async function main() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={ <Layout /> } />
+          <Route path=":value" element={ <Layout /> } />
+          <Route path="/wrap-unwrap" element={ <Layout /> } />
         </Routes>
       </BrowserRouter>
     </React.StrictMode>,
