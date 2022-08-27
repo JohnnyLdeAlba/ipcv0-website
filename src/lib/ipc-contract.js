@@ -25,7 +25,7 @@ function parseTx(tx) {
   if (match != null)
     return match[1];
 
-  return null;
+  return "";
 }
 
 function approvalEvent(ipc_contract) {
@@ -83,8 +83,6 @@ function wrapXEvent(ipc_contract) {
   }
 }
 
-
-
 class t_ipc_contract extends t_subscriptions {
 
   sourceAddress;
@@ -94,6 +92,7 @@ class t_ipc_contract extends t_subscriptions {
   mwc_provider;
   provider;
   defaultProvider;
+  approvedForAll;
 
   sourceContract;
   wrapperContract;
@@ -109,6 +108,7 @@ class t_ipc_contract extends t_subscriptions {
     this.mwc_provider = null;
     this.provider = null;
     this.defaultProvider = null;
+    this.approvedForAll = false;
 
     this.sourceContract = null;
     this.wrapperContract = null;
@@ -168,6 +168,9 @@ class t_ipc_contract extends t_subscriptions {
     this.provider = provider;
     this.sourceContract = sourceContract;
     this.wrapperContract = wrapperContract;
+    this.isApprovedForAll().then(approvedForAll => {
+      this.approvedForAll = approvedForAll;
+    });
   }
 
   disconnect() {
@@ -292,27 +295,16 @@ class t_ipc_contract extends t_subscriptions {
 
   async isApprovedForAll() {
 
-    if (this.defaultProvider == null)
-      return false;
-
     if (this.provider == null)
-      return false;
-
+      return { code: -1, payload: "NOT_CONNECTED" };
+    
     const signer = this.provider.getSigner();
+    const signerAddress = await signer.getAddress();
 
-    const sourceContract = new ethers.Contract(
-      this.sourceAddress, sourceABI, this.defaultProvider);
-
-    console.log(signer.address);
-    console.log(this.wrapperAddress);
-
-    const approvedForAll = await sourceContract
-      .isApprovedForAll(
-        signer.address,
-	this.wrapperAddress)
-      .catch(error => { console.log(error); return false });
-
-    console.log(approvedForAll);
+    const approvedForAll = await this.sourceContract
+      .connect(signer)
+      .isApprovedForAll(signerAddress, this.wrapperAddress)
+      .catch(error => false);
 
     return approvedForAll;
   }

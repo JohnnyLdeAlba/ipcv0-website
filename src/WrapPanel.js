@@ -137,6 +137,7 @@ function changePage(wrap_panel, nextPage) {
 
 class t_wrap_panel {
 
+  serial;
   visible;
   wrapped;
   sortBy;
@@ -146,6 +147,7 @@ class t_wrap_panel {
 
   constructor() {
 
+    this.serial = 0;
     this.visible = false;
     this.wrapped = false;
     this.sortBy = "tokenId";
@@ -158,6 +160,7 @@ class t_wrap_panel {
     
     const wrap_panel = new t_wrap_panel;
 
+    wrap_panel.serial = this.serial;
     wrap_panel.visible = this.visible;
     wrap_panel.wrapped = this.wrapped;
     wrap_panel.sortBy = this.sortBy;
@@ -167,6 +170,8 @@ class t_wrap_panel {
 
     return wrap_panel;
   }
+
+  update() { this.serial++; }
 }
 
 function WrapBlank(props) {
@@ -198,15 +203,17 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
     if (approvalForAll == "pending")
       return;
 
-    const enabled = approvalForAll == "enabled" ? true : false;
-
+    const enabled = approvalForAll == "enabled" ? false : true;
     const tx = await ipc_contract.setApprovalForAll(enabled);
     if (tx.code == -1) {
 
+      if (tx.payload == "")
+        return;
+
       context.openSnackbar(
         "error",
-        lang.getCaption("MUST_BE_APPROVED"),
-        lang.getMessage("MUST_BE_APPROVED")
+        lang.getCaption("APPROVALFORALL_NOT_OWNER"),
+        lang.getMessage("APPROVALFORALL_NOT_OWNER")
       );    
 
       return;
@@ -214,8 +221,8 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
 
     context.openSnackbar(
       "pending",
-      lang.getCaption("APPROVAL_PENDING"),
-      lang.getMessage("APPROVAL_PENDING"),
+      lang.getCaption("APPROVALFORALL_PENDING"),
+      lang.getMessage("APPROVALFORALL_PENDING"),
       "https://etherscan.io/tx/" + tx.payload
     );    
 
@@ -232,14 +239,14 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
           return;
 
         if (approved)
-          setApprovalForAll("disabled");
-        else
           setApprovalForAll("enabled");
+        else
+          setApprovalForAll("disabled");
 
         context.openSnackbar(
           "success",
-          lang.getCaption("APPROVAL_OK"),
-          lang.getMessage("APPROVAL_OK")
+          lang.getCaption("APPROVALFORALL_OK"),
+          lang.getMessage("APPROVALFORALL_OK")
         );    
 
 	context.removeSubscriber(
@@ -251,7 +258,7 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
   };
 }
 
-function wrapXEvent(wrapX, setWrapX, wrapAll) {
+function wrapXEvent(wrapX, setWrapX, wrapAll, wrap_panel) {
 
   const ipc_contract = context.ipc_contract;
 
@@ -260,26 +267,56 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
     if (wrapX == "pending")
       return;
 
+    context.showCircular(true);
     const tx = await ipc_contract.wrapX(0, wrapAll);
+    context.showCircular(false);
+
     if (tx.code == -1) {
 
-      context.openSnackbar(
-        "error",
-        lang.getCaption("MUST_BE_APPROVED"),
-        lang.getMessage("MUST_BE_APPROVED")
-      );    
+      if (tx.payload == "")
+        return;
+
+      if (wrapAll) {
+
+        context.openSnackbar(
+          "error",
+          lang.getCaption("WRAPALL_FAILED"),
+          lang.getMessage("WRAPALL_FAILED")
+        );    
+      }
+      else {
+
+        context.openSnackbar(
+          "error",
+          lang.getCaption("UNWRAPALL_FAILED"),
+          lang.getMessage("UNWRAPALL_FAILED")
+        );    
+      }
 
       return;
     }
 
-    context.openSnackbar(
-      "pending",
-      lang.getCaption("APPROVAL_PENDING"),
-      lang.getMessage("APPROVAL_PENDING"),
-      "https://etherscan.io/tx/" + tx.payload
-    );    
+    if (wrapAll) {
+
+      context.openSnackbar(
+        "pending",
+        lang.getCaption("WRAPALL_PENDING"),
+        lang.getMessage("WRAPALL_PENDING"),
+        "https://etherscan.io/tx/" + tx.payload
+      );    
+    }
+    else {
+
+      context.openSnackbar(
+        "pending",
+        lang.getCaption("UNWRAPALL_PENDING"),
+        lang.getMessage("UNWRAPALL_PENDING"),
+        "https://etherscan.io/tx/" + tx.payload
+      );    
+    }
 
     setWrapX("pending");
+    await context.delay();
 
     context.addSubscriber(
       "wrapX",
@@ -296,11 +333,30 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
         else
           setWrapX("unwrapAll");
 
-        context.openSnackbar(
-          "success",
-          lang.getCaption("APPROVAL_OK"),
-          lang.getMessage("APPROVAL_OK")
-        );    
+	if (wrapAll) {
+
+          wrap_panel.wrapped = true;
+          wrap_panel.update();
+
+          context.processSubscription("updateWrapPanel", [ wrap_panel ]);
+          context.openSnackbar(
+            "success",
+            lang.getCaption("WRAPALL_OK"),
+            lang.getMessage("WRAPALL_OK")
+          );    
+        }
+        else {
+
+          wrap_panel.wrapped = false;
+          wrap_panel.update();
+
+          context.processSubscription("updateWrapPanel", [ wrap_panel ]);
+          context.openSnackbar(
+            "success",
+            lang.getCaption("UNWRAPALL_OK"),
+            lang.getMessage("UNWRAPALL_OK")
+          );    
+	}
 
 	context.removeSubscriber(
           "wrapX",
@@ -311,15 +367,15 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
   };
 }
 
+function WrapControlPanel(props) {
 
+  const wrap_panel = props.controller;
+  const approvedForAll = context.ipc_contract
+    .approvedForAll ? "enabled" : "disabled";
 
-function WrapControlPanel() {
-
-  const [ approvalForAll, setApprovalForAll ] = React.useState("disabled");
+  const [ approvalForAll, setApprovalForAll ] = React.useState(approvedForAll);
   const [ wrapAll, setWrapAll ] = React.useState("wrapAll");
   const [ unwrapAll, setUnwrapAll ] = React.useState("unwrapAll");
-
-  // use effect to get current status of approval for all.
 
   const CardBody = styled(Box)({
 
@@ -344,8 +400,8 @@ function WrapControlPanel() {
 
     switch (state) {
 
-      case "enabled": return "Enabled";
-      case "disabled": return "Disabled";
+      case "enabled": return "Disable";
+      case "disabled": return "Enable";
       default: return "Pending";
     }
 
@@ -375,10 +431,10 @@ function WrapControlPanel() {
             <Box>...</Box>
 	  </Box>
           <Box sx={{ flex: 1, textAlign: "right" } }>
-            <PendingButton variant="contained" onClick={ wrapXEvent(wrapAll, setWrapAll, true) }>
+            <PendingButton variant="contained" onClick={ wrapXEvent(wrapAll, setWrapAll, true, wrap_panel) }>
 	      { wrapAll == "wrapAll" ? "Wrap All" : "Pending" }
 	    </PendingButton>
-            <PendingButton variant="contained" onClick={ wrapXEvent(unwrapAll, setUnwrapAll, false) }>
+            <PendingButton variant="contained" onClick={ wrapXEvent(unwrapAll, setUnwrapAll, false, wrap_panel) }>
 	      { unwrapAll == "unwrapAll" ? "Unwrap All" : "Pending" }
 	    </PendingButton>
 
@@ -388,7 +444,6 @@ function WrapControlPanel() {
     </Card>
   );
 }
-
 
 export function WrapPanel(props) {
 
@@ -505,7 +560,7 @@ export function WrapPanel(props) {
 
     <CardContainer show={ visible }>
 
-    <WrapControlPanel />
+    <WrapControlPanel controller={ wrap_panel } />
 
     <Card
       icon={ wrapped ? <LockIcon /> : <LockOpenIcon /> }

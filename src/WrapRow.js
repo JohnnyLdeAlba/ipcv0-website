@@ -275,8 +275,21 @@ function approvalEvent(ipc, update, setUpdate) {
     if (ipc.pending == true)
       return;
 
+    if (await ipc_contract.isApprovedForAll()) {
+
+      ipc.approved = true;
+      ipc.wrapped = false;
+      ipc.pending = false;
+      setUpdate(++update);
+
+      return;
+    }
+
     const tx = await ipc_contract.approve(ipc.token_id);
     if (tx.code == -1) {
+
+      if (tx.payload == "")
+        return;
 
       context.openSnackbar(
         "error",
@@ -360,7 +373,11 @@ function wrappedEvent(ipc, update, setUpdate) {
     }
 
     const tx = await ipc_contract.wrap(ipc.token_id);
+
     if (tx.code == -1) {
+
+      if (tx.payload == "")
+        return;
 
       context.openSnackbar(
         "error",
@@ -424,6 +441,9 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
     const tx = await ipc_contract.unwrap(ipc.token_id);
     if (tx.code == -1) {
+
+      if (tx.payload == "")
+        return;
 
       context.openSnackbar(
         "error",
