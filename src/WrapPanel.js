@@ -77,7 +77,7 @@ function wrapEffect(payload) {
 
     if (ipc_database.ownersTokens == null) {
 
-      wrap_panel.visible = true;
+      wrap_panel.update();
 
       context.processSubscription(
         "updateWrapPanel",
@@ -88,12 +88,15 @@ function wrapEffect(payload) {
     context.addSubscriber("updateWrapPanel", "wrapPanel", (payload) => {
 
       const [ wrap_panel ] = payload;
-	     
+
+      const accountDetails = context.getAccountDetails();
+
       context.showCircular(true);
 
       ipc_database.requestOwnersTokens(
         // "0xd8E09Afd099f14F245c7c3F348bd25cbf9762d3D",
-        "0xE185e4A8e4E5A73B5899fb20Cd73f7Af5AEa8440",
+        // "0xE185e4A8e4E5A73B5899fb20Cd73f7Af5AEa8440",
+	accountDetails.account,
         (wrap_panel.page + 1) * wrap_panel.rowsPerPage,
         wrap_panel.wrapped,
         true
@@ -107,7 +110,17 @@ function wrapEffect(payload) {
 
     if (ipc_database.ownersBalance == -1) {
 
-      wrap_panel.visible = true;
+      const accountDetails = context.getAccountDetails();
+      console.log(accountDetails);
+      if (accountDetails == false) {
+
+	ipc_database.ownersBalance = 0;
+        wrap_panel.visible = false;
+        setWrapPanel(wrap_panel.clone());
+	return;
+      }
+
+      wrap_panel.visible = false;
       context.processSubscription(
         "updateWrapPanel",
 	[ wrap_panel ]
@@ -204,7 +217,9 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
       return;
 
     const enabled = approvalForAll == "enabled" ? false : true;
-    const tx = await ipc_contract.setApprovalForAll(enabled);
+
+    const tx = await ipc_contract
+      .setApprovalForAll(enabled);
     if (tx.code == -1) {
 
       if (tx.payload == "")
@@ -367,15 +382,25 @@ function wrapXEvent(wrapX, setWrapX, wrapAll, wrap_panel) {
   };
 }
 
-function WrapControlPanel(props) {
+function WrapConfig(props) {
 
   const wrap_panel = props.controller;
-  const approvedForAll = context.ipc_contract
-    .approvedForAll ? "enabled" : "disabled";
-
-  const [ approvalForAll, setApprovalForAll ] = React.useState(approvedForAll);
+  const [ approvalForAll, setApprovalForAll ] = React.useState("disabled");
   const [ wrapAll, setWrapAll ] = React.useState("wrapAll");
   const [ unwrapAll, setUnwrapAll ] = React.useState("unwrapAll");
+
+  React.useEffect(() => {
+
+    if (approvalForAll == "disabled") {
+
+      context.ipc_contract.isApprovedForAll()
+        .then(approvedForAll => {
+
+          const state = approvedForAll ? "enabled" : "disabled";
+          setApprovalForAll(state);
+      });
+    }
+  });
 
   const CardBody = styled(Box)({
 
@@ -388,6 +413,17 @@ function WrapControlPanel(props) {
     display: "flex",
     flexDirection: "row",
     padding: "16px"
+  });
+
+  const Title = styled(Box)({
+
+    fontSize: "16px",
+    fontWeight: "bold",
+    paddingBottom: "8px"
+  });
+
+  const SubTitle = styled(Box)({
+    fontSize: "14px",
   });
 
   const PendingButton = styled(Button)({
@@ -416,8 +452,8 @@ function WrapControlPanel(props) {
       <CardBody>
         <Row> 
           <Box>
-            <Box>Approval All Tokens</Box>
-            <Box>...</Box>
+            <Title>Approve All Tokens</Title>
+            <SubTitle>Allow the contract to automatically approve all your IPCs.</SubTitle>
 	  </Box>
           <Box sx={{ flex: 1, textAlign: "right" } }>
             <PendingButton variant="contained" onClick={ setApprovalForAllEvent(approvalForAll, setApprovalForAll) }>
@@ -427,8 +463,8 @@ function WrapControlPanel(props) {
 	</Row>
         <Row> 
           <Box>
-            <Box>Wrap All</Box>
-            <Box>...</Box>
+            <Title>Wrap/UnWrap All</Title>
+            <SubTitle>Wrap and unwrap all your tokens in a single click!</SubTitle>
 	  </Box>
           <Box sx={{ flex: 1, textAlign: "right" } }>
             <PendingButton variant="contained" onClick={ wrapXEvent(wrapAll, setWrapAll, true, wrap_panel) }>
@@ -560,7 +596,7 @@ export function WrapPanel(props) {
 
     <CardContainer show={ visible }>
 
-    <WrapControlPanel controller={ wrap_panel } />
+    <WrapConfig controller={ wrap_panel } />
 
     <Card
       icon={ wrapped ? <LockIcon /> : <LockOpenIcon /> }

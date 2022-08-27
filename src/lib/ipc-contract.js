@@ -92,7 +92,6 @@ class t_ipc_contract extends t_subscriptions {
   mwc_provider;
   provider;
   defaultProvider;
-  approvedForAll;
 
   sourceContract;
   wrapperContract;
@@ -108,13 +107,13 @@ class t_ipc_contract extends t_subscriptions {
     this.mwc_provider = null;
     this.provider = null;
     this.defaultProvider = null;
-    this.approvedForAll = false;
+    this.approvalForAll = false;
 
     this.sourceContract = null;
     this.wrapperContract = null;
   }
 
-  initialize() {
+  async initialize() {
 
     if (config.developerMode == true) {
 
@@ -140,7 +139,7 @@ class t_ipc_contract extends t_subscriptions {
     this.createSubscription("approvalForAll");
     this.createSubscription("wrapped");
     this.createSubscription("unwrapped");
-    this.createSubscription("wrapX")
+    this.createSubscription("wrapX");
   }
 
   connect() {
@@ -168,9 +167,6 @@ class t_ipc_contract extends t_subscriptions {
     this.provider = provider;
     this.sourceContract = sourceContract;
     this.wrapperContract = wrapperContract;
-    this.isApprovedForAll().then(approvedForAll => {
-      this.approvedForAll = approvedForAll;
-    });
   }
 
   disconnect() {
@@ -295,18 +291,18 @@ class t_ipc_contract extends t_subscriptions {
 
   async isApprovedForAll() {
 
-    if (this.provider == null)
-      return { code: -1, payload: "NOT_CONNECTED" };
-    
-    const signer = this.provider.getSigner();
-    const signerAddress = await signer.getAddress();
+    if (this.defaultProvider == null)
+      return false;
 
-    const approvedForAll = await this.sourceContract
-      .connect(signer)
-      .isApprovedForAll(signerAddress, this.wrapperAddress)
-      .catch(error => false);
+    const sourceContract = new ethers.Contract(
+      this.sourceAddress, sourceABI, this.defaultProvider);
 
-    return approvedForAll;
+    const accountDetails = this.mwc_provider.getAccountDetails();
+    const approvedAddress = await sourceContract
+      .isApprovedForAll(accountDetails.account, this.wrapperAddress)
+      .catch(error => {  console.log(error); return false; } );
+
+    return approvedAddress;
   }
 
   async isApproved(tokenId) {
@@ -314,17 +310,12 @@ class t_ipc_contract extends t_subscriptions {
     if (this.defaultProvider == null)
       return false;
 
-    if (this.provider == null)
-      return false;
-
-    const signer = this.provider.getSigner();
-
     const sourceContract = new ethers.Contract(
       this.sourceAddress, sourceABI, this.defaultProvider);
 
     const approvedAddress = await sourceContract
       .getApproved(tokenId)
-      .catch(error => {   console.log(error);  return "";  } );
+      .catch(error => false );
 
     const approved = this.wrapperAddress == approvedAddress ? true : false;
     return approved;

@@ -11,7 +11,7 @@ class t_config {
 
   constructor() {
 
-    this.developerMode = true;
+    this.developerMode = false;
 
     if (this.developerMode == true) {
 

@@ -30,6 +30,9 @@ export class t_context extends t_subscriptions {
   constructor() {
 
     super();
+
+    this.mwc_provider = null;
+    this.ipc_contract = null;
     this.ipc_database = null;
   }
 
@@ -48,6 +51,7 @@ export class t_context extends t_subscriptions {
     this.ipc_contract.mwc_provider = this.mwc_provider;
     this.ipc_contract.subscriptions = this.subscriptions;
 
+
     this.createSubscription("connect");
     this.createSubscription("disconnect");
     this.createSubscription("sessionUpdate");
@@ -61,7 +65,6 @@ export class t_context extends t_subscriptions {
 
     this.mwc_provider.setProviderURI(config.providerURI);
     this.ipc_contract.initialize();
-
     this.ipc_database = createIPCDatabase(this);
 
     await this.autoConnect();
@@ -84,6 +87,10 @@ export class t_context extends t_subscriptions {
       chainId: sessionStorage.getItem("chainId"),
       account: sessionStorage.getItem("account")
     };
+  }
+
+  getAccountDetails() {
+    return this.mwc_provider.getAccountDetails();
   }
 
   autoConnect() {
