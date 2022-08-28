@@ -1,2 +1,3 @@
+* Need to fix issue with wallet connect and button updates.
 * Need to update login credentials when switching wallets in MetaMask.
 * Find out why events are working on mainnet and make popups show up longer.

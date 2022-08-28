@@ -4,13 +4,25 @@ import { styled } from '@mui/material/styles';
 
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
-import ConstructionIcon from '@mui/icons-material/Construction';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 
 import { Card } from "./Card";
 import { getContext } from "./context";
 
 const context = getContext();
 const lang = context.getLang();
+
+function Logo() {
+
+  const Logo = styled('img')({
+
+    display: "block",
+    margin: "20px auto 30px auto",
+    width: "45%"
+  });
+
+  return <Logo src="/assets/ipcv0.svg" />;
+}
 
 function CardContainer(props) {
 
@@ -70,12 +82,14 @@ export function About(props) {
   return (
     <CardContainer>
       <Card
-        icon={ <ConstructionIcon /> }
+        icon={ <LiveHelpIcon /> }
         title="About"
         subtitle=""
         show={ mounted }
       >
         <Body>
+
+<Logo />
 
 <p>This is an unofficial website for Immortal Playable Characters minted on the unsupported version 0 contract that was deployed in 2018.</p>
 
