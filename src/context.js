@@ -7,6 +7,22 @@ import { IPCLib } from "./lib/ipc-lib";
 import { getConfig } from "./config";
 import { getTheme } from "./theme";
 
+class t_about {
+
+  serial;
+  setUpdate;
+
+  constructor() {
+
+    this.serial = 0;
+    this.setUpdate = () => {};
+  }
+
+  update() {
+    this.setUpdate(++this.serial);
+  }
+}
+
 export class t_wrap_panel {
 
   serial;
@@ -88,6 +104,8 @@ export class t_context extends t_subscriptions {
   mwc_provider;
   ipc_contract;
   ipc_database;
+
+  about;
   wrap_panel;
 
   constructor() {
@@ -97,6 +115,8 @@ export class t_context extends t_subscriptions {
     this.mwc_provider = null;
     this.ipc_contract = null;
     this.ipc_database = null;
+
+    this.about = null;
     this.wrap_panel = null
   }
 
@@ -132,6 +152,7 @@ export class t_context extends t_subscriptions {
     this.ipc_contract.initialize();
     this.ipc_database = createIPCDatabase(this);
 
+    this.about = new t_about();
     this.wrap_panel = new t_wrap_panel();
 
     await this.autoConnect();
@@ -195,8 +216,16 @@ export class t_context extends t_subscriptions {
     );
   }
 
-  updateWrapPanel() {
+  update() {
 
+    this.about.mounted = false;
+    this.wrap_panel.mounted = false;
+
+    this.about.update();
+
+    this.processSubscription(
+      "updateWrapPanel"
+    );
   }
 
   async delay() {

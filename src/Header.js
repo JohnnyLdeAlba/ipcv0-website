@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Link as RLink } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
@@ -12,9 +13,22 @@ import { getContext } from "./context";
 const context = getContext();
 const theme = context.getTheme();
 
+function DLink(props) {
+
+  const update = () => {
+    context.update();
+  };
+
+  return (
+    <RLink to={ props.to } className={ props.className } onClick={ update }>
+      { props.children }
+    </RLink>
+  );
+}
+
 function Logo() {
 
-  const RLink = styled(Link)({ display: "block" });
+  const CLink = styled(DLink)({ display: "block" });
 
   const Image = styled('img')({
 
@@ -29,15 +43,15 @@ function Logo() {
   });
 
   return (
-    <RLink href="/">
+    <CLink to="/">
       <Image src="assets/ipcv0-small.svg" />
-    </RLink>
+    </CLink>
   );
 }
 
 function IOLogo() {
 
-  const RLink = styled(Link)({
+  const CLink = styled(DLink)({
 
     display: "none",
 
@@ -56,9 +70,9 @@ function IOLogo() {
   });
 
   return (
-    <RLink href="/">
+    <CLink to="/">
       <Image src="assets/ipcv0-io.svg" />
-    </RLink>
+    </CLink>
   );
 }
 
@@ -241,7 +255,7 @@ export function Header(props) {
       <MenuRow>
         <Container>
 	  <Menu>
-            <MenuItem>About</MenuItem>
+            <MenuItem><DLink to="/about">About</DLink></MenuItem>
             <MenuItem>
               <Link href="https://opensea.io/collection/immortal-player-characters-v0-wrapped">
                 OpenSea

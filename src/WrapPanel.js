@@ -46,6 +46,8 @@ function wrapEffect(wrap_panel, setWrapPanel) {
     });
 
     context.addSubscriber("disconnect", "wrapPanel", (payload) => {
+
+      ipc_database.resetOwnersTokens();
       wrap_panel.show(false);
     });
 
@@ -53,7 +55,7 @@ function wrapEffect(wrap_panel, setWrapPanel) {
 
       const accountDetails = context.getAccountDetails();
 
-      if (wrap_panel.mounted === false)
+      if (wrap_panel.mounted == false)
         return;
 
       if (accountDetails.account == null) {
@@ -84,7 +86,7 @@ function wrapEffect(wrap_panel, setWrapPanel) {
 
     });
 
-    if (ipc_database.ownersBalance === -1) {
+    if (ipc_database.ownersBalance == -1) {
 
       context.processSubscription(
         "updateWrapPanel"
@@ -238,6 +240,8 @@ export function WrapPanel(props) {
 
   if (location.pathname == "/")
     wrap_panel.mounted = true;
+  else
+    wrap_panel.mounted = false;
 
   const mounted = wrap_panel.mounted;
 
