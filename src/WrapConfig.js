@@ -9,7 +9,6 @@ import { Card } from "./Card";
 import { getContext } from "./context";
 
 const context = getContext();
-// const theme = context.getTheme();
 const lang = context.getLang();
 
 function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
@@ -18,16 +17,16 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
 
   return async () => {
 
-    if (approvalForAll === "pending")
+    if (approvalForAll == "pending")
       return;
 
-    const enabled = approvalForAll === "enabled" ? false : true;
+    const enabled = approvalForAll == "enabled" ? false : true;
 
     const tx = await ipc_contract
       .setApprovalForAll(enabled);
-    if (tx.code === -1) {
+    if (tx.code == -1) {
 
-      if (tx.payload === "")
+      if (tx.payload == "")
         return;
 
       context.openSnackbar(
@@ -54,9 +53,9 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
       "approvalForAll",
       (payload) => {
 
-        const [ eventId, , , approved ] = payload;
+        const [ eventId, owner, operator, approved ] = payload;
 
-        if (eventId !== "approvalForAll")
+        if (eventId != "approvalForAll")
           return;
 
         if (approved)
@@ -78,23 +77,23 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
   };
 }
 
-// interferes with wrap and unwrap. 
 function wrapXEvent(wrapX, setWrapX, wrapAll) {
 
   const ipc_contract = context.ipc_contract;
+  const ipc_database = context.ipc_database;
 
   return async () => {
 
-    if (wrapX === "pending")
+    if (wrapX == "pending")
       return;
 
     context.showCircular(true);
     const tx = await ipc_contract.wrapX(0, wrapAll);
     context.showCircular(false);
 
-    if (tx.code === -1) {
+    if (tx.code == -1) {
 
-      if (tx.payload === "")
+      if (tx.payload == "")
         return;
 
       if (wrapAll) {
@@ -145,9 +144,9 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
       (payload) => {
 
         const wrap_panel = context.wrap_panel;
-        const [ eventId, , ] = payload;
+        const [ eventId, owner, wrapTokens, totalTokens ] = payload;
 
-        if (eventId !== "wrapX")
+        if (eventId != "wrapX")
           return;
 
 	if (wrapAll)
@@ -158,6 +157,9 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
 	if (wrapAll) {
 
           wrap_panel.wrapped = true;
+	  wrap_panel.update();
+
+          ipc_database.resetOwnersTokens();
           context.processSubscription("updateWrapPanel");
 
           context.openSnackbar(
@@ -169,6 +171,9 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
         else {
 
           wrap_panel.wrapped = false;
+          wrap_panel.update();
+
+          ipc_database.resetOwnersTokens();
           context.processSubscription("updateWrapPanel");
 
           context.openSnackbar(
@@ -205,7 +210,7 @@ export function WrapConfig(props) {
         setApprovalForAll(approvedForAllState);
     });
 
-    if (approvalForAll === null) {
+    if (approvalForAll == null) {
 
       context.ipc_contract.isApprovedForAll()
         .then(approvedForAll => {
@@ -278,6 +283,7 @@ export function WrapConfig(props) {
       icon={ <ConstructionIcon /> }
       title="Wrapper Configuration"
       subtitle=""
+      show={ props.show }
     >
       <Table>
         <Row> 
@@ -298,10 +304,10 @@ export function WrapConfig(props) {
 	  </Box>
           <Box sx={{ flex: 1, textAlign: "right" } }>
             <PendingButton variant="contained" onClick={ wrapXEvent(wrapAll, setWrapAll, true) }>
-	      { wrapAll === "wrapAll" ? "Wrap All" : "Pending" }
+	      { wrapAll == "wrapAll" ? "Wrap All" : "Pending" }
 	    </PendingButton>
             <PendingButton variant="contained" onClick={ wrapXEvent(unwrapAll, setUnwrapAll, false) }>
-	      { unwrapAll === "unwrapAll" ? "Unwrap All" : "Pending" }
+	      { unwrapAll == "unwrapAll" ? "Unwrap All" : "Pending" }
 	    </PendingButton>
 
 	  </Box>

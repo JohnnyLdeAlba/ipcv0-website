@@ -65,6 +65,8 @@ function unwrappedEvent(ipc_contract) {
 
   return (tokenId, owner) => {
 
+
+
     ipc_contract.processSubscription(
       "unwrapped",
       [ "unwrapped", tokenId, owner ]

@@ -74,8 +74,8 @@ function Action(props) {
 
 function PendingButton(props) {
 
-  const display = (typeof props.show === "undefined" ||
-    props.show === true) ? "inline-flex" : "none"; 
+  const display = (typeof props.show == "undefined" ||
+    props.show == true) ? "inline-flex" : "none"; 
 
   const label = props.pending ? "Pending" : props.children;
 
@@ -274,7 +274,7 @@ function approvalEvent(ipc, update, setUpdate) {
 
   return async () => {
 
-    if (ipc.pending === true)
+    if (ipc.pending == true)
       return;
 
     if (await ipc_contract.isApprovedForAll()) {
@@ -288,9 +288,9 @@ function approvalEvent(ipc, update, setUpdate) {
     }
 
     const tx = await ipc_contract.approve(ipc.token_id);
-    if (tx.code === -1) {
+    if (tx.code == -1) {
 
-      if (tx.payload === "")
+      if (tx.payload == "")
         return;
 
       context.openSnackbar(
@@ -319,8 +319,8 @@ function approvalEvent(ipc, update, setUpdate) {
 
         const [ eventId, owner, approved, tokenId ] = payload;
 
-        if (eventId !== "approval" ||
-          tokenId !== ipc.token_id)
+        if (eventId != "approval" ||
+          tokenId != ipc.token_id)
             return;
 
         if (approved)
@@ -362,12 +362,12 @@ function wrappedEvent(ipc, update, setUpdate) {
 
   return async () => {
 
-    if (ipc.pending === true)
+    if (ipc.pending == true)
       return;
 
-    if (await ipc_contract.isApprovedForAll() === false) {
+    if (await ipc_contract.isApprovedForAll() == false) {
 
-      if (await ipc_contract.isApproved(ipc.token_id) === false) {
+      if (await ipc_contract.isApproved(ipc.token_id) == false) {
 
         ipc.approved = false;
         ipc.wrapped = false;
@@ -386,9 +386,9 @@ function wrappedEvent(ipc, update, setUpdate) {
 
     const tx = await ipc_contract.wrap(ipc.token_id);
 
-    if (tx.code === -1) {
+    if (tx.code == -1) {
 
-      if (tx.payload === "")
+      if (tx.payload == "")
         return;
 
       context.openSnackbar(
@@ -417,8 +417,8 @@ function wrappedEvent(ipc, update, setUpdate) {
 
         const [ eventId, tokenId, owner ] = payload;
 
-        if (eventId !== "wrapped" ||
-          tokenId !== ipc.token_id)
+        if (eventId != "wrapped" ||
+          tokenId != ipc.token_id)
             return;
 
         ipc.wrapped = true;
@@ -446,7 +446,7 @@ function wrappedEvent(ipc, update, setUpdate) {
           "wrapped",
           resourceId
         );
-    });
+    }); 
   };
 }
 
@@ -459,13 +459,13 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
   return async () => {
 
-    if (ipc.pending === true)
+    if (ipc.pending == true)
       return;
 
     const tx = await ipc_contract.unwrap(ipc.token_id);
-    if (tx.code === -1) {
+    if (tx.code == -1) {
 
-      if (tx.payload === "")
+      if (tx.payload == "")
         return;
 
       context.openSnackbar(
@@ -494,8 +494,8 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
         const [ eventId, tokenId, owner ] = payload;
 
-        if (eventId !== "unwrapped" ||
-          tokenId !== ipc.token_id)
+        if (eventId != "unwrapped" ||
+          tokenId != ipc.token_id)
             return;
 
         ipc.approved = true;
@@ -530,13 +530,13 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
 function SortButton(props) {
 
-  const ArrowRightDisplay = props.show === false
+  const ArrowRightDisplay = props.show == false
     ? "inline-block" : "none";
 
-  const ArrowUpDisplay = props.orderBy === "desc" && props.show === true
+  const ArrowUpDisplay = props.orderBy == "desc" && props.show == true
     ? "inline-block" : "none";
 
-  const ArrowDownDisplay = props.orderBy === "asc" && props.show === true
+  const ArrowDownDisplay = props.orderBy == "asc" && props.show == true
     ? "inline-block" : "none";
 
   const SortButton = styled(Box)({
@@ -575,7 +575,7 @@ function onClick(sortBy) {
     const wrap_panel = context.wrap_panel;
 
     wrap_panel.sortBy = sortBy;
-    wrap_panel.orderBy = wrap_panel.orderBy === "asc"
+    wrap_panel.orderBy = wrap_panel.orderBy == "asc"
       ? "desc" : "asc";
 
     wrap_panel.update();
@@ -589,11 +589,11 @@ export function WrapCaption(props) {
   const sortBy = wrap_panel.sortBy;
   const orderBy = wrap_panel.orderBy;
 
-  const tokenId = sortBy === "tokenId" ? true : false;
-  const race = sortBy === "race" ? true : false;
-  const gender = sortBy === "gender" ? true : false;
-  const height = sortBy === "height" ? true : false;
-  const handedness = sortBy === "handedness" ? true : false;
+  const tokenId = sortBy == "tokenId" ? true : false;
+  const race = sortBy == "race" ? true : false;
+  const gender = sortBy == "gender" ? true : false;
+  const height = sortBy == "height" ? true : false;
+  const handedness = sortBy == "handedness" ? true : false;
 
   const WrapCaption = styled(Row)({
 
@@ -684,7 +684,7 @@ export function WrapRow(props) {
   const eventId = "wrapRowUnmount_" + ipc.token_id;
   React.useEffect(effectWrapRow(eventId));
 
-  if (props.ipc === null)
+  if (props.ipc == null)
     return (<></>);
 
   const Image = styled("img")({

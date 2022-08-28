@@ -10,8 +10,11 @@ const theme = context.getTheme();
 
 export function Card(props) {
 
+  const display = props.show == false ? "none" : "block";
+
   const Card = styled(Box)({
 
+    display: display,
     margin: "16px",
     paddingBottom: "8px",
     borderRadius: "8px",

@@ -7,6 +7,68 @@ import { IPCLib } from "./lib/ipc-lib";
 import { getConfig } from "./config";
 import { getTheme } from "./theme";
 
+export class t_wrap_panel {
+
+  serial;
+  mounted;
+  visible;
+  wrapped;
+  sortBy;
+  orderBy;
+  rowsPerPage;
+  page;
+  totalPages;
+  setWrapPanel;
+  showWrapPanel;
+
+  constructor() {
+
+    this.serial = 0;
+    this.mounted = false;
+    this.visible = false;
+    this.wrapped = false;
+    this.sortBy = "tokenId";
+    this.orderBy = "asc";
+    this.rowsPerPage = 10;
+    this.page = 0;
+    this.totalPages = 0;
+    this.setWrapPanel = (wrap_panel) => {};
+    this.showWrapPanel = (visible) => {};
+  }
+
+  clone() {
+    
+    const wrap_panel = new t_wrap_panel();
+
+    wrap_panel.serial = this.serial;
+    wrap_panel.mounted = this.mounted;
+    wrap_panel.visible = this.visible;
+    wrap_panel.wrapped = this.wrapped;
+    wrap_panel.sortBy = this.sortBy;
+    wrap_panel.orderBy = this.orderBy;
+    wrap_panel.rowsPerPage = this.rowsPerPage;
+    wrap_panel.page = this.page;
+    wrap_panel.totalPages = this.totalPages;
+    wrap_panel.setWrapPanel = this.setWrapPanel
+    wrap_panel.showWrapPanel = this.showWrapPanel;
+
+    return wrap_panel;
+  }
+
+  show(visible) {
+
+    this.visible = visible;
+    this.showWrapPanel(visible);
+    this.setWrapPanel(this.clone());
+  }
+
+  update() {
+
+    this.serial++;
+    this.setWrapPanel(this.clone());
+  }
+}
+
 function onConnectWallet(accountDetails) {
 
   sessionStorage.setItem("providerName", accountDetails.providerName);
@@ -53,7 +115,6 @@ export class t_context extends t_subscriptions {
     this.ipc_contract.mwc_provider = this.mwc_provider;
     this.ipc_contract.subscriptions = this.subscriptions;
 
-
     this.createSubscription("connect");
     this.createSubscription("disconnect");
     this.createSubscription("sessionUpdate");
@@ -70,6 +131,8 @@ export class t_context extends t_subscriptions {
     this.mwc_provider.setProviderURI(config.providerURI);
     this.ipc_contract.initialize();
     this.ipc_database = createIPCDatabase(this);
+
+    this.wrap_panel = new t_wrap_panel();
 
     await this.autoConnect();
     await this.ipc_database.loadDatabase();
