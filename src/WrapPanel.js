@@ -56,8 +56,16 @@ function wrapEffect(wrap_panel, setWrapPanel) {
       if (wrap_panel.mounted === false)
         return;
 
-      if (accountDetails.account == null)
+      if (accountDetails.account == null) {
+
+        context.processSubscription("showBackdrop");
+        context.processSubscription("openConnectDialog");
+
         return;
+      }
+
+      context.processSubscription("hideBackdrop");
+      context.processSubscription("closeConnectDialog");
 
       context.showCircular(true);
 

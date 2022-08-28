@@ -243,8 +243,8 @@ export function Header(props) {
 	  <Menu>
             <MenuItem>About</MenuItem>
             <MenuItem>
-              <Link href="/wrap-unwrap">
-                Wrap/Unwrap IPCs
+              <Link href="https://opensea.io/collection/immortal-player-characters-v0-wrapped">
+                OpenSea
               </Link> 
             </MenuItem>
 	    <ConnectMenuItem />
