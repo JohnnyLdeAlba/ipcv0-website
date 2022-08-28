@@ -3,16 +3,12 @@ import React from "react";
 import { styled } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-
-import MenuList from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Switch from "@mui/material/Switch";
 
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
+import { IPCLib } from "./lib/ipc-lib";
 import { getContext } from "./context";
 
 const context = getContext();
@@ -78,8 +74,8 @@ function Action(props) {
 
 function PendingButton(props) {
 
-  const display = (typeof props.show == "undefined" ||
-    props.show == true) ? "inline-flex" : "none"; 
+  const display = (typeof props.show === "undefined" ||
+    props.show === true) ? "inline-flex" : "none"; 
 
   const label = props.pending ? "Pending" : props.children;
 
@@ -135,6 +131,7 @@ function RowItem(props) {
       return (<Height className={ props.className } onClick={ props.onClick }>{ props.children }</Height>);
     case "handedness":
       return (<Handedness className={ props.className } onClick={ props.onClick }>{ props.children }</Handedness>);
+    default: break;
   }
 
   const Label = styled(Box)({
@@ -266,13 +263,18 @@ function Gender(props) {
     </Gender>);
 }
 
+
+
 function approvalEvent(ipc, update, setUpdate) {
 
   const ipc_contract = context.ipc_contract;
 
+  const eventId = "wrapRowUnmount_" + ipc.token_id;
+  const resourceId = "approval_" + ipc.token_id;
+
   return async () => {
 
-    if (ipc.pending == true)
+    if (ipc.pending === true)
       return;
 
     if (await ipc_contract.isApprovedForAll()) {
@@ -286,9 +288,9 @@ function approvalEvent(ipc, update, setUpdate) {
     }
 
     const tx = await ipc_contract.approve(ipc.token_id);
-    if (tx.code == -1) {
+    if (tx.code === -1) {
 
-      if (tx.payload == "")
+      if (tx.payload === "")
         return;
 
       context.openSnackbar(
@@ -310,8 +312,6 @@ function approvalEvent(ipc, update, setUpdate) {
     ipc.pending = true;
     setUpdate(++update);
 
-    const resourceId = "approval" + ipc.token_id;
-
     context.addSubscriber(
       "approval",
       resourceId,
@@ -319,8 +319,8 @@ function approvalEvent(ipc, update, setUpdate) {
 
         const [ eventId, owner, approved, tokenId ] = payload;
 
-        if (eventId != "approval" ||
-          tokenId != ipc.token_id)
+        if (eventId !== "approval" ||
+          tokenId !== ipc.token_id)
             return;
 
         if (approved)
@@ -339,8 +339,17 @@ function approvalEvent(ipc, update, setUpdate) {
           "approval",
           resourceId
         );
-      } 
-    );
+      });
+
+    context.addSubscriber(
+      eventId,
+      resourceId,
+      () => {
+        context.removeSubscriber(
+          "approval",
+          resourceId
+        );
+    });
   };
 }
 
@@ -348,14 +357,17 @@ function wrappedEvent(ipc, update, setUpdate) {
 
   const ipc_contract = context.ipc_contract;
 
+  const eventId = "wrapRowUnmount_" + ipc.token_id;
+  const resourceId = "wrapped_" + ipc.token_id;
+
   return async () => {
 
-    if (ipc.pending == true)
+    if (ipc.pending === true)
       return;
 
-    if (await ipc_contract.isApprovedForAll() == false) {
+    if (await ipc_contract.isApprovedForAll() === false) {
 
-      if (await ipc_contract.isApproved(ipc.token_id) == false) {
+      if (await ipc_contract.isApproved(ipc.token_id) === false) {
 
         ipc.approved = false;
         ipc.wrapped = false;
@@ -374,9 +386,9 @@ function wrappedEvent(ipc, update, setUpdate) {
 
     const tx = await ipc_contract.wrap(ipc.token_id);
 
-    if (tx.code == -1) {
+    if (tx.code === -1) {
 
-      if (tx.payload == "")
+      if (tx.payload === "")
         return;
 
       context.openSnackbar(
@@ -398,8 +410,6 @@ function wrappedEvent(ipc, update, setUpdate) {
     ipc.pending = true;
     setUpdate(++update);
 
-    const resourceId = "wrapped" + ipc.token_id;
-
     context.addSubscriber(
       "wrapped",
       resourceId,
@@ -407,8 +417,8 @@ function wrappedEvent(ipc, update, setUpdate) {
 
         const [ eventId, tokenId, owner ] = payload;
 
-        if (eventId != "wrapped" ||
-          tokenId != ipc.token_id)
+        if (eventId !== "wrapped" ||
+          tokenId !== ipc.token_id)
             return;
 
         ipc.wrapped = true;
@@ -427,6 +437,16 @@ function wrappedEvent(ipc, update, setUpdate) {
         );
       } 
     );
+
+    context.addSubscriber(
+      eventId,
+      resourceId,
+      () => {
+        context.removeSubscriber(
+          "wrapped",
+          resourceId
+        );
+    });
   };
 }
 
@@ -434,15 +454,18 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
   const ipc_contract = context.ipc_contract;
 
+  const eventId = "wrapRowUnmount_" + ipc.token_id;
+  const resourceId = "unwrapped_" + ipc.token_id;
+
   return async () => {
 
-    if (ipc.pending == true)
+    if (ipc.pending === true)
       return;
 
     const tx = await ipc_contract.unwrap(ipc.token_id);
-    if (tx.code == -1) {
+    if (tx.code === -1) {
 
-      if (tx.payload == "")
+      if (tx.payload === "")
         return;
 
       context.openSnackbar(
@@ -464,8 +487,6 @@ function unwrappedEvent(ipc, update, setUpdate) {
     ipc.pending = true;
     setUpdate(++update);
 
-    const resourceId = "unwrapped" + ipc.token_id;
-
     context.addSubscriber(
       "unwrapped",
       resourceId,
@@ -473,8 +494,8 @@ function unwrappedEvent(ipc, update, setUpdate) {
 
         const [ eventId, tokenId, owner ] = payload;
 
-        if (eventId != "unwrapped" ||
-          tokenId != ipc.token_id)
+        if (eventId !== "unwrapped" ||
+          tokenId !== ipc.token_id)
             return;
 
         ipc.approved = true;
@@ -494,50 +515,28 @@ function unwrappedEvent(ipc, update, setUpdate) {
         );
       } 
     );
+
+    context.addSubscriber(
+      eventId,
+      resourceId,
+      () => {
+        context.removeSubscriber(
+          "unwrapped",
+          resourceId
+        );
+    });
   };
-}
-
-export function WrapControls(props) {
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleClickListItem = (event) => {
-	    setAnchorEl(event.currentTarget);
-	  };
-
-  const ControlRow = styled(Row)({
-
-    display: "none",
-    padding: "8px 0",
-
-  });
-
-  const SwitchWrapper = styled(Box)({
-
-    padding: "0 16px",
-    fontSize: "14px",
-    fontWeight: "bold"
-  });
-
-  const WrapSwitch = Switch;
-  return (<>
-	   <Button onClick={handleClickListItem} >test</Button>
-      <MenuList sx={{ '& .MuiPaper-root': { backgroundColor: "red"  }  }} open={anchorEl ? true : false} anchorEl={anchorEl} >
-        <MenuItem>test</MenuItem>
-      </MenuList>
-	  </>
-  );
 }
 
 function SortButton(props) {
 
-  const ArrowRightDisplay = props.show == false
+  const ArrowRightDisplay = props.show === false
     ? "inline-block" : "none";
 
-  const ArrowUpDisplay = props.orderBy == "desc" && props.show == true
+  const ArrowUpDisplay = props.orderBy === "desc" && props.show === true
     ? "inline-block" : "none";
 
-  const ArrowDownDisplay = props.orderBy == "asc" && props.show == true
+  const ArrowDownDisplay = props.orderBy === "asc" && props.show === true
     ? "inline-block" : "none";
 
   const SortButton = styled(Box)({
@@ -569,30 +568,32 @@ function SortButton(props) {
   );
 }
 
-function onClick(sortBy, controller) {
+function onClick(sortBy) {
 
   return () => {
 
-    controller.sortBy = sortBy;
-    controller.orderBy = controller.orderBy == "asc"
+    const wrap_panel = context.wrap_panel;
+
+    wrap_panel.sortBy = sortBy;
+    wrap_panel.orderBy = wrap_panel.orderBy === "asc"
       ? "desc" : "asc";
 
-    context.processSubscription("sortWrapPanel", [ controller ]);
+    wrap_panel.update();
   }
 }
 
 export function WrapCaption(props) {
 
-  const controller = props.controller;
+  const wrap_panel = context.wrap_panel;
 
-  const sortBy = controller.sortBy;
-  const orderBy = controller.orderBy;
+  const sortBy = wrap_panel.sortBy;
+  const orderBy = wrap_panel.orderBy;
 
-  const tokenId = sortBy == "tokenId" ? true : false;
-  const race = sortBy == "race" ? true : false;
-  const gender = sortBy == "gender" ? true : false;
-  const height = sortBy == "height" ? true : false;
-  const handedness = sortBy == "handedness" ? true : false;
+  const tokenId = sortBy === "tokenId" ? true : false;
+  const race = sortBy === "race" ? true : false;
+  const gender = sortBy === "gender" ? true : false;
+  const height = sortBy === "height" ? true : false;
+  const handedness = sortBy === "handedness" ? true : false;
 
   const WrapCaption = styled(Row)({
 
@@ -620,7 +621,7 @@ export function WrapCaption(props) {
       <Avatar>&nbsp;</Avatar>
       <Caption>
 
-        <CaptionItem onClick={ onClick("tokenId", controller) }>
+        <CaptionItem onClick={ onClick("tokenId") }>
 	  Token Id
 	  <SortButton
 	    show={ tokenId }
@@ -628,7 +629,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem onClick={ onClick("race", controller) }>
+        <CaptionItem onClick={ onClick("race") }>
 	  Race
 	  <SortButton
 	    show={ race }
@@ -636,7 +637,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="gender" onClick={ onClick("gender", controller) }>
+        <CaptionItem type="gender" onClick={ onClick("gender") }>
 	  Gender
 	  <SortButton
 	    show={ gender }
@@ -644,7 +645,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="height" onClick={ onClick("height", controller) }>
+        <CaptionItem type="height" onClick={ onClick("height") }>
 	  Height
 	  <SortButton
 	    show={ height }
@@ -652,7 +653,7 @@ export function WrapCaption(props) {
 	  />
 	</CaptionItem>
 
-        <CaptionItem type="handedness" onClick={ onClick("handedness", controller) }>
+        <CaptionItem type="handedness" onClick={ onClick("handedness") }>
 	  Handedness
 	  <SortButton
 	    show={ handedness }
@@ -666,12 +667,24 @@ export function WrapCaption(props) {
  );
 }
 
+function effectWrapRow(eventId) {
+
+  return () => {
+    return () => {
+      context.processSubscription(eventId);
+    };
+  };
+}
+
 export function WrapRow(props) {
 
   const [ update, setUpdate ] = React.useState(0);
+  const ipc = props.ipc ? props.ipc : new IPCLib.t_label_ipc();
 
-  const ipc = props.ipc ? props.ipc : null;
-  if (props.ipc == null)
+  const eventId = "wrapRowUnmount_" + ipc.token_id;
+  React.useEffect(effectWrapRow(eventId));
+
+  if (props.ipc === null)
     return (<></>);
 
   const Image = styled("img")({
@@ -694,7 +707,7 @@ export function WrapRow(props) {
       </RowSpan>
       <Action>
 
-        <PendingButton>View</PendingButton>
+        <PendingButton onClick={ () => { window.open(`/card/${ipc.token_id}.jpg`); } }>Card</PendingButton>
 
         <PendingButton
 	  show={ !ipc.wrapped && !ipc.approved }

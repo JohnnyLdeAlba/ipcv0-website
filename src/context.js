@@ -26,6 +26,7 @@ export class t_context extends t_subscriptions {
   mwc_provider;
   ipc_contract;
   ipc_database;
+  wrap_panel;
 
   constructor() {
 
@@ -34,6 +35,7 @@ export class t_context extends t_subscriptions {
     this.mwc_provider = null;
     this.ipc_contract = null;
     this.ipc_database = null;
+    this.wrap_panel = null
   }
 
   async initialize() {
@@ -59,6 +61,8 @@ export class t_context extends t_subscriptions {
     this.createSubscription("openAccountDialog");
     this.createSubscription("sortWrapPanel");
     this.createSubscription("updateWrapPanel");
+    this.createSubscription("wrapRowUnmount");
+    this.createSubscription("approvalForAllUpdate");
 
     this.addSubscriber("connect", "context", onConnectWallet);
     this.addSubscriber("disconnect", "context", onDisconnectWallet);
@@ -126,6 +130,10 @@ export class t_context extends t_subscriptions {
       "openSnackbar",
       [ type, caption, content, link ]
     );
+  }
+
+  updateWrapPanel() {
+
   }
 
   async delay() {
