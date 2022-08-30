@@ -105,9 +105,15 @@ export function About(props) {
 <H1>What's special about v0s?</H1>
 <p>The v0 contract was deployed on <B><Link href="https://etherscan.io/tx/0x62b674f6385cd319b5c7d536635e9930df26b1e5a747b8b8e02442fa5cda02ea">March 14th 2018</Link></B>, making it a historical piece of NFT history.</p>
 
-<H1>What's the Official stance on v0?</H1>
+<H1>What's the official stance on v0?</H1>
 <p><I>"It is Broken, DON’T USE! IMPORTANT: This smart contract is broken, DO NOT USE IT! We do not support it, and we will NOT build games for these pre-IPC IPCs. Just want to be clear on that."</I></p>
 <p>You can find out more from this <B><Link href="https://www.immortalplayercharacters.com/single-post/contract-zero-v0">official blog post</Link></B>.</p>
+
+<H1>Is the wrapper contract verified?</H1>
+<p>Yes it is, and you can view it's status along with it's source code <B><Link href="https://etherscan.io/address/0x61e1ea57558b81c3b62578901502fe74d5a924c1#code">here</Link></B>.</p>
+
+<H1>Who can I contact if I have any questions or issues reguarding version 0 or the wrapper?</H1>
+<p>I am Johnny L. de Alba, I go by <B><Link href="https://twitter.com/0xarkonviox">0xArkonviox</Link></B> on Twitter and <B><Link href="https://discord.com/invite/nft-relics">Arkonviox#6121</Link></B> on Discord. You can also email me at johnnyldealba@gmail.com. If you are interested in other proijects I have done you can view my portfolio <B><Link href="https://nexusultima.com">here</Link></B>.</p>
 
 <H1>Additional Links</H1>
 <p><B>- <Link href="https://www.immortalplayercharacters.com">Official Website</Link></B></p>

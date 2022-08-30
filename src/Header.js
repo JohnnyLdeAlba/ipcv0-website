@@ -97,7 +97,7 @@ function DiscordIcon() {
   });
 
   return (
-    <Link href="https://discord.com/invite/tppsuZp7v3">
+    <Link href="https://discord.com/invite/nft-relics">
       <Image src="assets/discord.svg" />
     </Link>
   );

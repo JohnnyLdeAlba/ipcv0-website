@@ -407,6 +407,7 @@ class t_ipc_contract extends t_subscriptions {
     return tx;
   }
 
+  // Need to handle when all tokens are wrapped. It reverts possibly due to zero tokens.
   async wrapX(total, wrapTokens) {
 
     if (this.provider == null)
