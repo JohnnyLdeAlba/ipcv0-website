@@ -34,7 +34,7 @@ function approvalEvent(ipc_contract) {
 
     ipc_contract.processSubscription(
       "approval",
-      [ "approval", owner, approved, tokenId ]
+      [ owner, approved, tokenId ]
     );
   }
 }
@@ -45,7 +45,7 @@ function approvalForAllEvent(ipc_contract) {
 
     ipc_contract.processSubscription(
       "approvalForAll",
-      [ "approvalForAll", owner, operator, approved ]
+      [ owner, operator, approved ]
     );
   }
 }
@@ -56,7 +56,7 @@ function wrappedEvent(ipc_contract) {
 
     ipc_contract.processSubscription(
       "wrapped",
-      [ "wrapped", tokenId, owner ]
+      [ tokenId, owner ]
     );
   }
 }
@@ -69,7 +69,7 @@ function unwrappedEvent(ipc_contract) {
 
     ipc_contract.processSubscription(
       "unwrapped",
-      [ "unwrapped", tokenId, owner ]
+      [ tokenId, owner ]
     );
   }
 }
@@ -80,7 +80,7 @@ function wrapXEvent(ipc_contract) {
 
     ipc_contract.processSubscription(
       "wrapX",
-      [ "wrapX", owner, wrapTokens ]
+      [ owner, wrapTokens ]
     );
   }
 }
@@ -91,7 +91,7 @@ class t_ipc_contract extends t_subscriptions {
   wrapperAddress;
 
   providerURI;
-  mwc_provider;
+  mwc_connector;
   provider;
   defaultProvider;
 
@@ -106,7 +106,7 @@ class t_ipc_contract extends t_subscriptions {
     this.wrapperAddress = config.wrapperContract;
 
     this.providerURI = null;
-    this.mwc_provider = null;
+    this.mwc_connector = null;
     this.provider = null;
     this.defaultProvider = null;
     this.approvalForAll = false;
@@ -130,11 +130,11 @@ class t_ipc_contract extends t_subscriptions {
       );
     }
 
-    this.mwc_provider.addSubscriber("connect", "ipcContract",
+    this.mwc_connector.addSubscriber("connect", "ipcContract",
       () => { this.connect(); });
-    this.mwc_provider.addSubscriber("sessionUpdate", "ipcContract",
+    this.mwc_connector.addSubscriber("sessionUpdate", "ipcContract",
       () => { this.connect(); });
-    this.mwc_provider.addSubscriber("disconnect", "ipcContract",
+    this.mwc_connector.addSubscriber("disconnect", "ipcContract",
       () => { this.disconnect(); });
 
     this.createSubscription("approval");
@@ -146,7 +146,7 @@ class t_ipc_contract extends t_subscriptions {
 
   connect() {
 
-    const web3_provider = this.mwc_provider.getWeb3Provider();
+    const web3_provider = this.mwc_connector.getWeb3Provider();
     if (web3_provider == null)
       return;
 
@@ -299,7 +299,7 @@ class t_ipc_contract extends t_subscriptions {
     const sourceContract = new ethers.Contract(
       this.sourceAddress, sourceABI, this.defaultProvider);
 
-    const accountDetails = this.mwc_provider.getAccountDetails();
+    const accountDetails = this.mwc_connector.getAccountDetails();
     if (accountDetails.account == null)
       return false;
 

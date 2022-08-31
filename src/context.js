@@ -1,5 +1,5 @@
 import { t_subscriptions } from "./lib/subscriptions";
-import { createMWCProvider } from "./lib/MultiWalletConnect/MWCProvider";
+import { createMWCConnector } from "./lib/MultiWalletConnect/MWCConnector";
 import { createIPCContract } from "./lib/ipc-contract";
 import { createIPCDatabase } from "./lib/ipc-database";
 import { IPCLib } from "./lib/ipc-lib";
@@ -85,7 +85,7 @@ export class t_wrap_panel {
   }
 }
 
-function onConnectWallet(accountDetails) {
+function onConnectWallet(event_id, subscriber_id, accountDetails) {
 
   sessionStorage.setItem("providerName", accountDetails.providerName);
   sessionStorage.setItem("chainId", accountDetails.chainId);
@@ -101,7 +101,7 @@ function onDisconnectWallet() {
 
 export class t_context extends t_subscriptions {
 
-  mwc_provider;
+  mwc_connector;
   ipc_contract;
   ipc_database;
 
@@ -112,7 +112,7 @@ export class t_context extends t_subscriptions {
 
     super();
 
-    this.mwc_provider = null;
+    this.mwc_connector = null;
     this.ipc_contract = null;
     this.ipc_database = null;
 
@@ -124,15 +124,15 @@ export class t_context extends t_subscriptions {
 
     const config = this.getConfig();
 
-    this.mwc_provider = createMWCProvider();
-    this.mwc_provider.setDefaultChainId(config.defaultChainId);
+    this.mwc_connector = createMWCConnector();
+    this.mwc_connector.setDefaultChainId(config.defaultChainId);
 
-    this.mwc_provider.subscriptions = this.subscriptions;
-    this.mwc_provider.initialize();
+    this.mwc_connector.subscriptions = this.subscriptions;
+    this.mwc_connector.initialize();
 
     this.ipc_contract = createIPCContract();
     this.ipc_contract.providerURI = config.providerURI;
-    this.ipc_contract.mwc_provider = this.mwc_provider;
+    this.ipc_contract.mwc_connector = this.mwc_connector;
     this.ipc_contract.subscriptions = this.subscriptions;
 
     this.createSubscription("connect");
@@ -148,7 +148,7 @@ export class t_context extends t_subscriptions {
     this.addSubscriber("connect", "context", onConnectWallet);
     this.addSubscriber("disconnect", "context", onDisconnectWallet);
 
-    this.mwc_provider.setProviderURI(config.providerURI);
+    this.mwc_connector.setProviderURI(config.providerURI);
     this.ipc_contract.initialize();
     this.ipc_database = createIPCDatabase(this);
 
@@ -164,7 +164,7 @@ export class t_context extends t_subscriptions {
   getLang() { return getConfig().lang; }
 
   getWalletProvider() {
-    return this.mwc_provider;
+    return this.mwc_connector;
   }
 
   getSession() {
@@ -178,13 +178,13 @@ export class t_context extends t_subscriptions {
   }
 
   getAccountDetails() {
-    return this.mwc_provider.getAccountDetails();
+    return this.mwc_connector.getAccountDetails();
   }
 
   autoConnect() {
 
     this.getSession();
-    this.mwc_provider.autoConnect(this.session);
+    this.mwc_connector.autoConnect(this.session);
   }
 
   hideBackdrop() {
@@ -193,7 +193,7 @@ export class t_context extends t_subscriptions {
     this.processSubscription("closeConnectDialog");
     this.processSubscription("closeAccountDialog");
     this.processSubscription("hideBackdrop");
-    this.processSubscription("lockBackdrop", false);
+    this.processSubscription("unlockBackdrop");
   }
 
   showCircular(visible) {
@@ -202,7 +202,7 @@ export class t_context extends t_subscriptions {
 
       this.processSubscription("showCircular");
       this.processSubscription("showBackdrop");
-      this.processSubscription("lockBackdrop", true);
+      this.processSubscription("lockBackdrop");
     }
     else 
       this.hideBackdrop();

@@ -315,11 +315,11 @@ function approvalEvent(ipc, update, setUpdate) {
     context.addSubscriber(
       "approval",
       resourceId,
-      (payload) => {
+      (event_id, subscriber_id, payload) => {
 
-        const [ eventId, owner, approved, tokenId ] = payload;
+        const [ owner, approved, tokenId ] = payload;
 
-        if (eventId != "approval" ||
+        if (event_id != "approval" ||
           tokenId != ipc.token_id)
             return;
 
@@ -413,11 +413,11 @@ function wrappedEvent(ipc, update, setUpdate) {
     context.addSubscriber(
       "wrapped",
       resourceId,
-      (payload) => {
+      (event_id, subscriber_id, payload) => {
 
-        const [ eventId, tokenId, owner ] = payload;
+        const [ tokenId, owner ] = payload;
 
-        if (eventId != "wrapped" ||
+        if (event_id != "wrapped" ||
           tokenId != ipc.token_id)
             return;
 
@@ -490,11 +490,11 @@ function unwrappedEvent(ipc, update, setUpdate) {
     context.addSubscriber(
       "unwrapped",
       resourceId,
-      (payload) => {
+      (event_id, subscriber_id, payload) => {
 
-        const [ eventId, tokenId, owner ] = payload;
+        const [ tokenId, owner ] = payload;
 
-        if (eventId != "unwrapped" ||
+        if (event_id != "unwrapped" ||
           tokenId != ipc.token_id)
             return;
 

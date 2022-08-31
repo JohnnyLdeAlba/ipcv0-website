@@ -31,27 +31,27 @@ function wrapEffect(wrap_panel, setWrapPanel) {
     context.wrap_panel = wrap_panel;
     context.wrap_panel.setWrapPanel = setWrapPanel;
 
-    context.addSubscriber("connect", "wrapPanel", (payload) => {
+    context.addSubscriber("connect", "wrapPanel", () => {
 
       context.processSubscription(
         "updateWrapPanel"
       );
     });
 
-    context.addSubscriber("sessionUpdate", "wrapPanel", (payload) => {
+    context.addSubscriber("sessionUpdate", "wrapPanel", () => {
 
       context.processSubscription(
         "updateWrapPanel"
       );
     });
 
-    context.addSubscriber("disconnect", "wrapPanel", (payload) => {
+    context.addSubscriber("disconnect", "wrapPanel", () => {
 
       ipc_database.resetOwnersTokens();
       wrap_panel.show(false);
     });
 
-    context.addSubscriber("updateWrapPanel", "wrapPanel", (payload) => {
+    context.addSubscriber("updateWrapPanel", "wrapPanel", () => {
 
       const accountDetails = context.getAccountDetails();
 

@@ -16,7 +16,7 @@ function openSnackbar(
   enqueueSnackbar,
   closeSnackbar) {
 
-  return (payload) => {
+  return (event_id, subscriber_id, payload) => {
 
     const [ type, caption, content, link ] = payload;
 

@@ -1,9 +1,9 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import { t_subscriptions } from "../subscriptions";
 
-function factoryConnect(mm_provider) {
+function connectEvent(mm_connector) {
 
-  const onChainRequest = factoryChainRequest(mm_provider);
+  const onChainRequest = chainRequestEvent(mm_connector);
 
   return (web3WalletPermissions) => {
 
@@ -11,73 +11,73 @@ function factoryConnect(mm_provider) {
       ?.caveats[0]
       ?.value[0]) {
 
-      mm_provider.account = web3WalletPermissions[0]
+      mm_connector.account = web3WalletPermissions[0]
         .caveats[0]
         .value[0];
     }
 
-    mm_provider.provider.request({ method: 'eth_chainId' })
+    mm_connector.provider.request({ method: 'eth_chainId' })
       .then(onChainRequest);
   };
 }
 
-function factoryChainRequest(mm_provider) {
+function chainRequestEvent(mm_connector) {
 
   return (chainId) => {
 
-    if (chainId != mm_provider.defaultChainId) {
+    if (chainId != mm_connector.defaultChainId) {
 
-      mm_provider.disconnect();
+      mm_connector.disconnect();
       return;
     }
 
-    mm_provider.connected = true;
-    mm_provider.chainId = chainId;
+    mm_connector.connected = true;
+    mm_connector.chainId = chainId;
 
-    mm_provider
+    mm_connector
       .processSubscription("connect",
-        mm_provider.getAccountDetails());
+        mm_connector.getAccountDetails());
   }
 }
 
-function factoryChainChanged(mm_provider) {
+function chainChangedEvent(mm_connector) {
 
   return (chainId) => {
 
-    if (chainId != mm_provider.defaultChainId) {
+    if (chainId != mm_connector.defaultChainId) {
 
-      mm_provider.disconnect();
+      mm_connector.disconnect();
       return;
     }
 
-    mm_provider.connected = true;
-    mm_provider.chainId = chainId;
+    mm_connector.connected = true;
+    mm_connector.chainId = chainId;
 
-    mm_provider
+    mm_connector
       .processSubscription("sessionUpdate",
-        mm_provider.getAccountDetails());
+        mm_connector.getAccountDetails());
   }
 }
 
-function factoryAccountsChanged(mm_provider) {
+function accountsChangedEvent(mm_connector) {
 
   return (accounts) => {
 
     if (accounts.length == 0) {
     
-      mm_provider.disconnect();
+      mm_connector.disconnect();
       return;
     }
 
-    mm_provider.account = accounts[0];
+    mm_connector.account = accounts[0];
 
-    mm_provider
+    mm_connector
       .processSubscription("sessionUpdate",
-        mm_provider.getAccountDetails());
+        mm_connector.getAccountDetails());
   };
 }
 
-function factoryError(mm_provider) {
+function errorEvent(mm_connector) {
 
   return (error) => {
 
@@ -85,7 +85,7 @@ function factoryError(mm_provider) {
 
       case 4001: {
 
-        mm_provider.response = {
+        mm_connector.response = {
           code: "PROVIDER_PERMISSION_DENIED",
           payload: null
         }
@@ -95,7 +95,7 @@ function factoryError(mm_provider) {
 
       default: {
 
-        mm_provider.response = {
+        mm_connector.response = {
           code: "PROVIDER_ERROR",
           payload: error.code
         }
@@ -144,16 +144,16 @@ class t_metamask extends t_subscriptions {
     if (this.provider == null)
       return;
 
-    const onDisconnect = () => {
+    const disconnect = () => {
       this.disconnect();
     }
 
-    const onChainChanged = factoryChainChanged(this);
-    const onAccountsChanged = factoryAccountsChanged(this);
+    const chainChanged = chainChangedEvent(this);
+    const accountsChanged = accountsChangedEvent(this);
 
-    this.provider.on('disconnect', onDisconnect);
-    this.provider.on('chainChanged', onChainChanged);
-    this.provider.on('accountsChanged', onAccountsChanged);
+    this.provider.on('disconnect', disconnect);
+    this.provider.on('chainChanged', chainChanged);
+    this.provider.on('accountsChanged', accountsChanged);
 
     this.providerEnabled = true;
   }
@@ -170,7 +170,7 @@ class t_metamask extends t_subscriptions {
     if (this.provider == null)
       return;
 
-    const onError = factoryError(this);
+    const onError = errorEvent(this);
 
     const chainId = await this.provider
       .request({ method: 'eth_chainId' })
@@ -213,16 +213,16 @@ class t_metamask extends t_subscriptions {
     if (this.provider == null)
       return;
 
-    const onConnect = factoryConnect(this);
-    const onError = factoryError(this);
+    const connect = connectEvent(this);
+    const error = errorEvent(this);
 
     this.provider
       .request({
         method: 'wallet_requestPermissions',
         params: [{ eth_accounts: {} }]
       })
-      .then(onConnect)
-      .catch(onError);
+      .then(connect)
+      .catch(error);
   }
 
   disconnect() {
@@ -266,6 +266,6 @@ class t_metamask extends t_subscriptions {
 
 }
 
-export function createMMProvider() {
+export function createMMConnector() {
   return new t_metamask;
 }

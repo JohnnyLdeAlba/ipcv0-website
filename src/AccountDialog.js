@@ -179,8 +179,7 @@ export function AccountDialog() {
   const disconnectWC = () => {
   
     context.getWalletProvider().disconnect();
-    context.processSubscription("closeAccountDialog");
-    context.processSubscription("hideBackdrop");
+    context.hideBackdrop();
   };
 
   return (

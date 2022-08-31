@@ -1,43 +1,43 @@
-import { createMMProvider } from "./MetaMaskProvider";
-import { createWCProvider } from "./WalletConnectProvider";
+import { createMMConnector } from "./MetaMaskConnector";
+import { createWCConnector } from "./WalletConnectConnector";
 import { t_subscriptions } from "../subscriptions"
 
 class t_multi_wallet_connect extends t_subscriptions {
 
   defaultChainId;
-  mm_provider;
-  wc_provider;
+  mm_connector;
+  wc_connector;
 
   constructor() {
 
     super();
 
     this.defaultChainId = "0x1";
-    this.mm_provider = null;
-    this.wc_provider = null;
+    this.mm_connector = null;
+    this.wc_connector = null;
   }
 
   async initialize() {
 
-    this.mm_provider = createMMProvider();
-    this.wc_provider = createWCProvider();
+    this.mm_connector = createMMConnector();
+    this.wc_connector = createWCConnector();
 
-    this.mm_provider.setDefaultChainId(this.defaultChainId);
-    this.wc_provider.setDefaultChainId(this.defaultChainId);
+    this.mm_connector.setDefaultChainId(this.defaultChainId);
+    this.wc_connector.setDefaultChainId(this.defaultChainId);
 
     this.createSubscription("connect");
     this.createSubscription("disconnect");
     this.createSubscription("sessionUpdate");
 
-    this.mm_provider.subscriptions = this.subscriptions;
-    this.wc_provider.subscriptions = this.subscriptions;
+    this.mm_connector.subscriptions = this.subscriptions;
+    this.wc_connector.subscriptions = this.subscriptions;
 
-    await this.mm_provider.initialize();
-    await this.wc_provider.initialize();
+    await this.mm_connector.initialize();
+    await this.wc_connector.initialize();
   }
 
   setProviderURI(uri) {
-    this.wc_provider.setProviderURI(uri);
+    this.wc_connector.setProviderURI(uri);
   }
 
   setDefaultChainId(defaultChainId) {
@@ -76,10 +76,10 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     if (this.isMobile()) {
 
-      if (this.mm_provider.mobileConnect())
+      if (this.mm_connector.mobileConnect())
         return true;
       else
-        this.wc_provider.connect();
+        this.wc_connector.connect();
     }
 
     return true;
@@ -91,13 +91,13 @@ class t_multi_wallet_connect extends t_subscriptions {
 
       case 'MetaMask': {
 
-        this.mm_provider.autoConnect(session);
+        this.mm_connector.autoConnect(session);
         return;
       }
 
       case 'WalletConnect': {
 
-        this.wc_provider.autoConnect(session);
+        this.wc_connector.autoConnect(session);
         return;
       }
     }
@@ -110,16 +110,16 @@ class t_multi_wallet_connect extends t_subscriptions {
       case 'METAMASK': {
 
         if (this.isMobile())
-          this.mm_provider.mobileConnect();
+          this.mm_connector.mobileConnect();
         else
-          this.mm_provider.connect();
+          this.mm_connector.connect();
 
         break;
       }
 
       default: {
 
-        this.wc_provider.connect()
+        this.wc_connector.connect()
         break;
       }
     }
@@ -127,8 +127,8 @@ class t_multi_wallet_connect extends t_subscriptions {
 
   disconnect() {
 
-    this.mm_provider.disconnect();
-    this.wc_provider.disconnect();
+    this.mm_connector.disconnect();
+    this.wc_connector.disconnect();
 
     this.chainId = null;
     this.account = null;
@@ -136,9 +136,9 @@ class t_multi_wallet_connect extends t_subscriptions {
 
   isConnected() {
 
-    if (this.mm_provider.isConnected())
+    if (this.mm_connector.isConnected())
       return true
-    else if (this.wc_provider.isConnected())
+    else if (this.wc_connector.isConnected())
       return true;
 
     return false;
@@ -146,11 +146,11 @@ class t_multi_wallet_connect extends t_subscriptions {
 
   getWeb3Provider() {
 
-    if (this.mm_provider.isConnected())
-      return this.mm_provider.getWeb3Provider();
+    if (this.mm_connector.isConnected())
+      return this.mm_connector.getWeb3Provider();
 
-    else if (this.wc_provider.isConnected())
-      return this.wc_provider.getWeb3Provider();
+    else if (this.wc_connector.isConnected())
+      return this.wc_connector.getWeb3Provider();
 
     return null;
   }
@@ -170,11 +170,11 @@ class t_multi_wallet_connect extends t_subscriptions {
       }
     }
 
-    if (this.mm_provider.isConnected())
-      return this.mm_provider.getAccountDetails(f);
+    if (this.mm_connector.isConnected())
+      return this.mm_connector.getAccountDetails(f);
 
-    else if (this.wc_provider.isConnected())
-      return this.wc_provider.getAccountDetails(f);
+    else if (this.wc_connector.isConnected())
+      return this.wc_connector.getAccountDetails(f);
 
     return {
 
@@ -185,6 +185,6 @@ class t_multi_wallet_connect extends t_subscriptions {
   }
 }
 
-export function createMWCProvider() {
+export function createMWCConnector() {
   return new t_multi_wallet_connect();
 }

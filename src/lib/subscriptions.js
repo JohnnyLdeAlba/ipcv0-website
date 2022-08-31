@@ -95,12 +95,14 @@ export class t_subscriptions {
     if (typeof this.subscriptions[event_id] == 'undefined')
       return;
 
-    Object.values(this.subscriptions[event_id])
-      .forEach((subscriber) => {
+    Object.entries(this.subscriptions[event_id])
+      .forEach((entry) => {
+
+        const [ subscriber_id, subscriber ] = entry;
 
         Object.values(subscriber)
           .forEach((callback) => {
-            callback(payload);
+            callback(event_id, subscriber_id, payload);
           });
       });
   }

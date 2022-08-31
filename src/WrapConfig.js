@@ -51,11 +51,11 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
     context.addSubscriber(
       "approvalForAll",
       "approvalForAll",
-      (payload) => {
+      (event_id, subscriber_id, payload) => {
 
-        const [ eventId, owner, operator, approved ] = payload;
+        const [ owner, operator, approved ] = payload;
 
-        if (eventId != "approvalForAll")
+        if (event_id != "approvalForAll")
           return;
 
         if (approved)
@@ -141,12 +141,12 @@ function wrapXEvent(wrapX, setWrapX, wrapAll) {
     context.addSubscriber(
       "wrapX",
       "wrapX",
-      (payload) => {
+      (event_id, subscriber_id, payload) => {
 
         const wrap_panel = context.wrap_panel;
-        const [ eventId, owner, wrapTokens, totalTokens ] = payload;
+        const [ owner, wrapTokens, totalTokens ] = payload;
 
-        if (eventId != "wrapX")
+        if (event_id != "wrapX")
           return;
 
 	if (wrapAll)
@@ -202,7 +202,7 @@ export function WrapConfig(props) {
     context.addSubscriber(
       "approvalForAllUpdate",
       "approvalForAll",
-      (payload) => {
+      (event_id, subscriber_id, payload) => {
     
         const [ approvedForAll ] = payload;
         const approvedForAllState = approvedForAll ? "enabled" : "disabled";

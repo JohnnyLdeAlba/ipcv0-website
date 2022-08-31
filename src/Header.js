@@ -135,7 +135,7 @@ function MenuItem(props) {
   );
 }
 
-function effectFactory(context, setConnection) {
+function connectMIEffect(context, setConnection) {
 
   const walletProvider = context.getWalletProvider();
 
@@ -162,7 +162,7 @@ function ConnectMenuItem(props) {
   const [ connected, setConnection ] = React.useState(
     context.getWalletProvider().isConnected());
 
-  React.useEffect(effectFactory(context, setConnection));
+  React.useEffect(connectMIEffect(context, setConnection));
 
   const openConnectDialog = () => {
 

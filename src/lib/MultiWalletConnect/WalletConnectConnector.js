@@ -4,13 +4,13 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import { t_subscriptions } from "../subscriptions";
 
-function factoryConnect(wc_provider) {
+function connectEvent(wc_connector) {
 
   return (error, payload) => {
 
     if (error) {
 
-      wc_provider.responce = {
+      wc_connector.responce = {
         code: "PROVIDER_CONNECT_FAILED",
         payload: null
       };
@@ -20,22 +20,22 @@ function factoryConnect(wc_provider) {
 
     const { accounts, chainId } = payload.params[0];
 
-    if (chainId != wc_provider.defaultChainId) {
+    if (chainId != wc_connector.defaultChainId) {
 
-      wc_provider.disconnect();
+      wc_connector.disconnect();
       return;
     }
 
-    wc_provider.web3_provider.enable();
-    wc_provider.connected = true;
-    wc_provider.chainId = chainId;
-    wc_provider.account = accounts[0];
+    wc_connector.web3_provider.enable();
+    wc_connector.connected = true;
+    wc_connector.chainId = chainId;
+    wc_connector.account = accounts[0];
 
-    wc_provider
+    wc_connector
       .processSubscription("connect",
-        wc_provider.getAccountDetails());
+        wc_connector.getAccountDetails());
 
-    wc_provider.responce = {
+    wc_connector.responce = {
 
       code: 0,
       payload: {
@@ -47,13 +47,13 @@ function factoryConnect(wc_provider) {
   };
 }
 
-function factorySessionUpdate(wc_provider) {
+function sessionUpdateEvent(wc_connector) {
 
   return (error, payload) => {
       
     if (error) {
 
-      wc_provider.responce = {
+      wc_connector.responce = {
         code: "PROVIDER_SESSION_UPDATE_FAILED",
         payload: null
       };
@@ -63,15 +63,15 @@ function factorySessionUpdate(wc_provider) {
 
     const { accounts, chainId } = payload.params[0];
 
-    wc_provider.connected = true;
-    wc_provider.chainId = chainId;
-    wc_provider.account = accounts[0];
+    wc_connector.connected = true;
+    wc_connector.chainId = chainId;
+    wc_connector.account = accounts[0];
 
-    wc_provider
+    wc_connector
       .processSubscription("sessionUpdate",
-        wc_provider.getAccountDetails());
+        wc_connector.getAccountDetails());
 
-    wc_provider.responce = {
+    wc_connector.responce = {
 
       code: 0,
       payload: {
@@ -82,13 +82,13 @@ function factorySessionUpdate(wc_provider) {
   };
 }
 
-function factoryDisconnect(wc_provider) {
+function factoryDisconnect(wc_connector) {
 
   return (error, payload) => {
 
     if (error) {
 
-     wc_provider.responce = {
+     wc_connector.responce = {
         code: "PROVIDER_DISCONNECT_FAILED",
         payload: null
       };
@@ -96,11 +96,11 @@ function factoryDisconnect(wc_provider) {
       return;
     }
 
-    wc_provider
+    wc_connector
       .processSubscription("disconnect",
-        wc_provider.getAccountDetails());
+        wc_connector.getAccountDetails());
 
-    wc_provider.responce = {
+    wc_connector.responce = {
       code: 0,
       payload: null
     };
@@ -159,13 +159,13 @@ class t_wallet_connect extends t_subscriptions {
     this.provider = provider;
     this.web3_provider = web3_provider;
 
-    const onConnect = factoryConnect(this);
-    const onSessionUpdate = factorySessionUpdate(this);
-    const onDisconnect = factoryDisconnect(this);
+    const connect = connectEvent(this);
+    const sessionUpdate = sessionUpdateEvent(this);
+    const disconnect = factoryDisconnect(this);
 
-    provider.on("connect", onConnect);
-    provider.on("session_update", onSessionUpdate);
-    provider.on("disconnect", onDisconnect);
+    provider.on("connect", connect);
+    provider.on("session_update", sessionUpdate);
+    provider.on("disconnect", disconnect);
   }
 
   getWeb3Provider() {
@@ -189,15 +189,15 @@ class t_wallet_connect extends t_subscriptions {
     if (this.provider == null)
       this.initialize();
 
-    const wc_provider = this;
+    const wc_connector = this;
 
     this.addSubscriber(
       "sessionUpdate", "wcAutoConnect", () => {
 
-      wc_provider.removeSubscriber(
+      wc_connector.removeSubscriber(
         "sessionUpdate", "wcAutoConnect");
 
-      if (session.account != wc_provider.account) {
+      if (session.account != wc_connector.account) {
 
         this.disconnect();
         return;
@@ -272,6 +272,6 @@ class t_wallet_connect extends t_subscriptions {
   }
 }
 
-export function createWCProvider() {
+export function createWCConnector() {
   return new t_wallet_connect;
 }
