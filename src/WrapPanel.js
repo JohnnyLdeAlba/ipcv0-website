@@ -130,7 +130,7 @@ function Table(props) {
 
     display: "flex",
     flexDirection: "column",
-    color: theme.textColor
+    color: theme.text
   });
 
   return (<Table>{ props.children }</Table>);

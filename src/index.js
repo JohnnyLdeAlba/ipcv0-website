@@ -15,7 +15,7 @@ import { AccountDialog } from "./AccountDialog";
 import { CircularProgress } from "./CircularProgress";
 
 import { getContext } from "./context";
-import { getMUITheme } from "./muiTheme";
+import { getMUITheme } from "./theme";
 import { SnackbarSubscriber } from "./Snackbar";
 import { About } from "./About";
 import { WrapPanel } from "./WrapPanel";
@@ -32,9 +32,9 @@ function Layout(props) {
 
     height: "100vh",
     overflow: "auto",
-    backgroundColor: theme.backgroundColor,
+    backgroundColor: theme.background,
     fontFamily: 'poppins-light',
-    color: theme.textColor
+    color: theme.text
   });
 
   return (<>

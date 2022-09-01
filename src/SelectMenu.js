@@ -23,8 +23,8 @@ export function SelectMenu(props) {
     sx: {
       "& .MuiMenu-paper": {
 
-        backgroundColor: theme.selectColor,
-	color: theme.textColor
+        backgroundColor: theme.select,
+	color: theme.text
       }
     }
   };
@@ -32,19 +32,19 @@ export function SelectMenu(props) {
   const SelectLabel = styled(InputLabel)({
 
     fontSize: "14px", 
-    color: theme.textColor,
+    color: theme.text,
 
-    "&.Mui-focused": { color: theme.textColor }	  
+    "&.Mui-focused": { color: theme.text }	  
   });
 
   const SelectSpan = styled(Select)({
 
     padding: "2px",
     fontSize: "12px",
-    backgroundColor: theme.selectColor,
-    color: theme.textColor,
+    backgroundColor: theme.select,
+    color: theme.text,
 
-    "& .MuiSelect-icon": { color: theme.textColor }
+    "& .MuiSelect-icon": { color: theme.text }
   });
 
   const SelectItem = styled(MenuItem, { themeProps: props })({
@@ -52,15 +52,15 @@ export function SelectMenu(props) {
     fontSize: "14px",
 
     ":hover": {
-      backgroundColor: theme.selectHighlightColor
+      backgroundColor: theme.selectHighlight
     },
 
     "&.Mui-selected": {
 
-      backgroundColor: theme.selectedColor,
+      backgroundColor: theme.selected,
 
       ":hover": {
-        backgroundColor: theme.selectHighlightColor
+        backgroundColor: theme.selectHighlight
       }
     }
   });

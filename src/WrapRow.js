@@ -24,7 +24,7 @@ function Row(props) {
     flexDirection: "row",
     alignItems: "center",
     borderStyle: "solid",
-    borderColor: `${ theme.borderTopColor } transparent ${ theme.borderBottomColor } transparent`,
+    borderColor: `${ theme.borderTop } transparent ${ theme.borderBottom } transparent`,
     borderWidth: "1px 0 1px 0",
   });
 
@@ -544,7 +544,7 @@ function SortButton(props) {
     position: "absolute",
     display: "inline-block",
     margin: "-2px 0 0 6px",
-    color: theme.textColor,
+    color: theme.text,
   });
 
   const ArrowRight = styled(ArrowRightIcon)({

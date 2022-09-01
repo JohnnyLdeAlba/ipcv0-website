@@ -112,7 +112,7 @@ const Snackbar = React.forwardRef((props, ref) => {
 	return "#4488ff";
 
       default:
-	return "blue";
+	return "#4488ff";
     }
   })(props.type);
 
@@ -124,12 +124,11 @@ const Snackbar = React.forwardRef((props, ref) => {
     margin: "0 16px",
     padding: "16px 16px 8px 16px",
     width: "400px",
-    backgroundColor: theme.snackbarColor,
-    color: theme.textColor
+    backgroundColor: theme.snackbar,
+    color: theme.text
   });
 
   const IconWrapper = styled(Box)({
-
     marginRight: "16px",
     color: iconColor
   });

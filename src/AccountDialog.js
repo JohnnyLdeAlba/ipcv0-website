@@ -11,7 +11,6 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { Card } from "./Card";
 import { List, ListItem } from "./Toolbox";
 import { getContext } from "./context";
-import { getMUITheme } from "./muiTheme";
 
 const context = getContext();
 const theme = context.getTheme();
@@ -43,7 +42,7 @@ function CardContainer(props) {
   const display = typeof props.show == "undefined" ||
     props.show == false ? "none" : "block";
 
-  const _CardContainer = styled(Box)({
+  const CardContainer = styled(Box)({
 
     display: display,
     width: "100%",
@@ -53,7 +52,7 @@ function CardContainer(props) {
     }
   });
 
-  return (<_CardContainer>{ props.children }</_CardContainer>);
+  return (<CardContainer>{ props.children }</CardContainer>);
 }
 
 function ListText(props) {

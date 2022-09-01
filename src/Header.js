@@ -118,7 +118,7 @@ function MenuItem(props) {
     fontFamily: "poppins-light",
     fontSize: "12px",
     fontWeight: "normal", 
-    color: theme.textColor,
+    color: theme.text,
     textAlign: "center",
 
     "@media (min-width: 600px)": {
@@ -191,7 +191,7 @@ function ConnectMenuItem(props) {
 export function Header(props) {
 
   const _Header = styled(Box)({
-    backgroundColor: theme.headerColor
+    backgroundColor: theme.header
   });
 
   const InnerContainer = styled(Box)({
@@ -225,7 +225,7 @@ export function Header(props) {
   });
 
   const MenuRow = styled(Box)({
-    backgroundColor: theme.menuColor
+    backgroundColor: theme.headerMenu
   });
 
   const Menu = styled(Box)({

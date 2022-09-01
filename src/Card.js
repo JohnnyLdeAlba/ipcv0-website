@@ -18,7 +18,7 @@ export function Card(props) {
     margin: "16px",
     paddingBottom: "8px",
     borderRadius: "8px",
-    backgroundColor: theme.cardColor,
+    backgroundColor: theme.card,
     overflow: "hidden"
   });
 
@@ -29,7 +29,7 @@ export function Card(props) {
     alignItems: "center",
     padding: "10px 16px",
     borderRadius: "8px 8px 0px 0px",
-    backgroundColor: theme.cardTitleColor,
+    backgroundColor: theme.cardTitle,
   });
 
   const TitleColumn = styled(Box)({
@@ -40,12 +40,12 @@ export function Card(props) {
 
   const TitleIcon = styled(Box)({
     marginRight: "16px",
-    color: theme.textColor
+    color: theme.text
   });
 
   const Title = styled(Box)({
 
-    color: theme.textColor,
+    color: theme.text,
     fontSize: "16px",
     fontWeight: "bold",
     letterSpacing: "0.2em"

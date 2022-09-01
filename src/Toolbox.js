@@ -30,7 +30,7 @@ const style = {
     padding: "16px",
     borderRadius: "0px",
     fontSize: "16px",
-    color: theme.textColor,
+    color: theme.text,
     textAlign: "left",
     textTransform: "none"
   }
