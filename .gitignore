@@ -5,7 +5,7 @@
 /.pnp
 .pnp.js
 push
-config.js
+/src/config.js
 
 # testing
 /coverage
