@@ -246,8 +246,6 @@ export function Header(props) {
 	  </LogoRow>
 	  <SearchColumn>
 	    <SocialSpan>
-              <OpenSeaIcon />
-              <DiscordIcon />
 	    </SocialSpan>
 	  </SearchColumn>
 	</InnerContainer>
@@ -257,8 +255,8 @@ export function Header(props) {
 	  <Menu>
             <MenuItem><DLink to="/about">About</DLink></MenuItem>
             <MenuItem>
-              <Link href="https://opensea.io/collection/immortal-player-characters-v0-wrapped">
-                OpenSea
+              <Link href="https://github.com/JohnnyLdeAlba/ipcv0-website">
+                GitHub
               </Link> 
             </MenuItem>
 	    <ConnectMenuItem />

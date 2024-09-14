@@ -65,8 +65,6 @@ function unwrappedEvent(ipc_contract) {
 
   return (tokenId, owner) => {
 
-
-
     ipc_contract.processSubscription(
       "unwrapped",
       [ tokenId, owner ]
@@ -146,7 +144,8 @@ class t_ipc_contract extends t_subscriptions {
 
   connect() {
 
-    const web3_provider = this.mwc_connector.getWeb3Provider();
+    let web3_provider = this.mwc_connector.getWeb3Provider();
+
     if (web3_provider == null)
       return;
 

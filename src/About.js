@@ -107,19 +107,18 @@ export function About(props) {
 
 <H1>What's the official stance on v0?</H1>
 <p><I>"It is Broken, DON’T USE! IMPORTANT: This smart contract is broken, DO NOT USE IT! We do not support it, and we will NOT build games for these pre-IPC IPCs. Just want to be clear on that."</I></p>
-<p>You can find out more from this <B><Link href="https://www.immortalplayercharacters.com/single-post/contract-zero-v0">official blog post</Link></B>.</p>
+
+<H1>What's Demo Mode?</H1>
+<p>If you go to connect wallet there is a Demo Mode that requires MetaMask. This allows the website to connect to the Ethereum network using MetaMasks api, it simulates a connection to wallet <B>0x0fd907a10932F4a09dE3ac43A557f02006A50A0D</B> (The author of this websites personal wallet). Do not attempt any transactions in this mode as they will fail and you might be charged. The purpose is to demonstrate how this website works.</p>
 
 <H1>Is the wrapper contract verified?</H1>
-<p>Yes it is, and you can view it's status along with it's source code <B><Link href="https://etherscan.io/address/0x61e1ea57558b81c3b62578901502fe74d5a924c1#code">here</Link></B>.</p>
+<p>Yes it is, and you can view its status along with its source code <B><Link href="https://etherscan.io/address/0x61e1ea57558b81c3b62578901502fe74d5a924c1#code">HERE</Link></B>.</p>
 
 <H1>Who can I contact if I have any questions or issues reguarding version 0 or the wrapper?</H1>
-<p>I am Johnny L. de Alba, I go by <B><Link href="https://twitter.com/0xarkonviox">0xArkonviox</Link></B> on Twitter and <B><Link href="https://discord.com/invite/nft-relics">Arkonviox#6121</Link></B> on Discord. You can also email me at johnnyldealba@gmail.com. If you are interested in other proijects I have done you can view my portfolio <B><Link href="https://nexusultima.com">here</Link></B>.</p>
+<p>I am Johnny L. de Alba, You can also email me at <B>johnnyldealba@gmail.com</B>. If you are interested in other projects I have done you can view my GitHub at <B><Link href="https://github.com/JohnnyLdeAlba">https://github.com/JohnnyLdeAlba</Link></B>.</p>
 
 <H1>Additional Links</H1>
-<p><B>- <Link href="https://www.immortalplayercharacters.com">Official Website</Link></B></p>
-<p><B>- <Link href="https://myipc.io">MyIPC.io</Link></B></p>
 <p><B>- <Link href="https://opensea.io/collection/immortalplayercharacter-v0">Unwrapped Version 0 Collection</Link></B></p>
-<p><B>- <Link href="https://opensea.io/collection/immortalplayercharacter">Version 1 Collection</Link></B></p>
 
         </Body> 
       </Card>

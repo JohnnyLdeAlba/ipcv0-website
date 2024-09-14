@@ -59,6 +59,16 @@ function ListText(props) {
   return (<ListText>{ props.children }</ListText>);
 }
 
+function ListDesc(props) {
+
+  const ListDesc = styled(Box)({
+    fontWeight: "normal",
+    fontSize: "9pt"
+  });
+
+  return (<ListDesc>{ props.children }</ListDesc>);
+}
+
 function MetaMaskLI() {
 
   const walletProvider = context.getWalletProvider(); 
@@ -113,6 +123,12 @@ export function ConnectDialog() {
     context.hideBackdrop();
   };
 
+  const connectDC = () => {
+  
+    context.getWalletProvider().connect("DemoConnect");
+    context.hideBackdrop();
+  };
+
   return (
     <CardContainer show={ visible }>
       <Card
@@ -124,6 +140,13 @@ export function ConnectDialog() {
 	  <MetaMaskLI />
           <ListButton onClick={ connectWC }>
 	    <WalletConnectIcon /> <ListText>Wallet Connect</ListText>
+    	  </ListButton>
+          <ListButton onClick={ connectDC }>
+	    <MetaMaskIcon />
+              <ListText>
+                Demo Mode
+                <ListDesc>Requires MetaMask</ListDesc>
+              </ListText>
     	  </ListButton>
         </List>
       </Card>

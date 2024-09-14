@@ -11,7 +11,7 @@ class t_config {
 
   constructor() {
 
-    this.developerMode = true;
+    this.developerMode = false;
 
     if (this.developerMode == true) {
 
@@ -22,7 +22,7 @@ class t_config {
     }
     else {
 
-      this.providerURI = "https://eth-mainnet.g.alchemy.com/v2/SYJS-Zaeo1W7JJNFsV8-ZeUJigU5VyNk";
+      this.providerURI = "6fYLeoOJ3Vp6ONxoiJ0jWkEYGcR8vRIH";
       this.defaultChainId = "0x1";
       this.sourceContract = "0x4787993750B897fBA6aAd9e7328FC4F5C126e17c";
       this.wrapperContract = "0x61E1eA57558B81c3B62578901502fe74D5a924c1";

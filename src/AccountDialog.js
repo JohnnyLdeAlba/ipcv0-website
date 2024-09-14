@@ -110,6 +110,17 @@ function ProviderItem(props) {
     	</ListItem>
       );
     }
+
+    case "DemoConnect": {
+
+      return (
+        <ListItem>
+	  <MetaMaskIcon />
+	  <ListText caption="Wallet Provider" subcaption="Demo Mode" />
+    	</ListItem>
+      );
+    }
+ 
   }
 
   return (<></>);
@@ -199,7 +210,7 @@ export function AccountDialog() {
 
 	  <ListItem>
 	    <WalletIcon />
-	    <ListText caption="Wallet Address" subcaption={ accountDetails.account } />
+	    <ListText caption="Wallet Address" subcaption={ accountDetails.providerName == "DemoConnect" ? "Demo Mode" : accountDetails.account } />
     	  </ListItem>
           
           <Button variant="contained" onClick={ disconnectWC } sx={ buttonStyle }>Disconnect</Button>

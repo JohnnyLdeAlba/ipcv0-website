@@ -42,7 +42,7 @@ export class t_wrap_panel {
     this.serial = 0;
     this.mounted = false;
     this.visible = false;
-    this.wrapped = false;
+    this.wrapped = true;
     this.sortBy = "tokenId";
     this.orderBy = "asc";
     this.rowsPerPage = 10;

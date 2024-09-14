@@ -1,5 +1,6 @@
 import { createMMConnector } from "./MetaMaskConnector";
 import { createWCConnector } from "./WalletConnectConnector";
+import { createDemoConnector } from "./DemoConnector";
 import { t_subscriptions } from "../subscriptions"
 
 class t_multi_wallet_connect extends t_subscriptions {
@@ -7,6 +8,7 @@ class t_multi_wallet_connect extends t_subscriptions {
   defaultChainId;
   mm_connector;
   wc_connector;
+  demo_connector;
 
   constructor() {
 
@@ -15,15 +17,18 @@ class t_multi_wallet_connect extends t_subscriptions {
     this.defaultChainId = "0x1";
     this.mm_connector = null;
     this.wc_connector = null;
+    this.demo_connector = null;
   }
 
   async initialize() {
 
     this.mm_connector = createMMConnector();
     this.wc_connector = createWCConnector();
+    this.demo_connector = createDemoConnector();
 
     this.mm_connector.setDefaultChainId(this.defaultChainId);
     this.wc_connector.setDefaultChainId(this.defaultChainId);
+    this.demo_connector.setDefaultChainId(this.defaultChainId);
 
     this.createSubscription("connect");
     this.createSubscription("disconnect");
@@ -31,9 +36,11 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     this.mm_connector.subscriptions = this.subscriptions;
     this.wc_connector.subscriptions = this.subscriptions;
+    this.demo_connector.subscriptions = this.subscriptions;
 
     await this.mm_connector.initialize();
     await this.wc_connector.initialize();
+    await this.demo_connector.initialize();
   }
 
   setProviderURI(uri) {
@@ -100,6 +107,13 @@ class t_multi_wallet_connect extends t_subscriptions {
         this.wc_connector.autoConnect(session);
         return;
       }
+
+      case 'DemoConnect': {
+
+        this.demo_connector.autoConnect(session);
+        return;
+      }
+
     }
   }
 
@@ -117,6 +131,12 @@ class t_multi_wallet_connect extends t_subscriptions {
         break;
       }
 
+      case 'DemoConnect': {
+
+        this.demo_connector.connect();
+        return;
+      }
+
       default: {
 
         this.wc_connector.connect()
@@ -129,6 +149,7 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     this.mm_connector.disconnect();
     this.wc_connector.disconnect();
+    this.demo_connector.disconnect();
 
     this.chainId = null;
     this.account = null;
@@ -139,6 +160,8 @@ class t_multi_wallet_connect extends t_subscriptions {
     if (this.mm_connector.isConnected())
       return true
     else if (this.wc_connector.isConnected())
+      return true;
+    else if (this.demo_connector.isConnected())
       return true;
 
     return false;
@@ -151,6 +174,9 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     else if (this.wc_connector.isConnected())
       return this.wc_connector.getWeb3Provider();
+    else if (this.demo_connector.isConnected())
+      return this.demo_connector.getWeb3Provider();
+
 
     return null;
   }
@@ -175,6 +201,8 @@ class t_multi_wallet_connect extends t_subscriptions {
 
     else if (this.wc_connector.isConnected())
       return this.wc_connector.getAccountDetails(f);
+    else if (this.demo_connector.isConnected())
+      return this.demo_connector.getAccountDetails(f);
 
     return {
 

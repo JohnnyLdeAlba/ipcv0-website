@@ -204,15 +204,15 @@ class t_ipc_database extends t_subscriptions {
         return -1;
     }
 
-    let responce_id = 0;
+    let response_id = 0;
     while (segmentTotalTokens < requestedTotalTokens) {
 
       if (wrapped == true)
-        responce_id = await this.getOwnersWrappedTokens(owner, approved);
+        response_id = await this.getOwnersWrappedTokens(owner, approved);
       else
-        responce_id = await this.getOwnersUnwrappedTokens(owner, approved);
+        response_id = await this.getOwnersUnwrappedTokens(owner, approved);
 
-      if (responce_id < 0)
+      if (response_id < 0)
         break;
 
       segmentTotalTokens = this.segmentTotalTokens();
