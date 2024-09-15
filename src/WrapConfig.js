@@ -17,6 +17,9 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
 
   return async () => {
 
+    if (isDemoMode())
+      return;
+
     if (approvalForAll == "pending")
       return;
 
@@ -77,12 +80,27 @@ function setApprovalForAllEvent(approvalForAll, setApprovalForAll) {
   };
 }
 
+function isDemoMode() {
+
+  const provider = context.getWalletProvider().demo_connector;
+
+  if (!provider.isConnected())
+    return false;
+
+  context.processSubscription("showBackdrop");
+  context.processSubscription("openDemoModeDialog");
+  return true;
+}
+
 function wrapXEvent(wrapX, setWrapX, wrapAll) {
 
   const ipc_contract = context.ipc_contract;
   const ipc_database = context.ipc_database;
 
   return async () => {
+
+    if (isDemoMode())
+      return;
 
     if (wrapX == "pending")
       return;

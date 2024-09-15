@@ -263,7 +263,17 @@ function Gender(props) {
     </Gender>);
 }
 
+function isDemoMode() {
 
+  const provider = context.getWalletProvider().demo_connector;
+
+  if (!provider.isConnected())
+    return false;
+
+  context.processSubscription("showBackdrop");
+  context.processSubscription("openDemoModeDialog");
+  return true;
+}
 
 function approvalEvent(ipc, update, setUpdate) {
 
@@ -273,6 +283,9 @@ function approvalEvent(ipc, update, setUpdate) {
   const resourceId = "approval_" + ipc.token_id;
 
   return async () => {
+
+    if (isDemoMode())
+      return;
 
     if (ipc.pending == true)
       return;
@@ -361,6 +374,9 @@ function wrappedEvent(ipc, update, setUpdate) {
   const resourceId = "wrapped_" + ipc.token_id;
 
   return async () => {
+
+    if (isDemoMode())
+      return;
 
     if (ipc.pending == true)
       return;
@@ -458,6 +474,9 @@ function unwrappedEvent(ipc, update, setUpdate) {
   const resourceId = "unwrapped_" + ipc.token_id;
 
   return async () => {
+
+    if (isDemoMode())
+      return;
 
     if (ipc.pending == true)
       return;

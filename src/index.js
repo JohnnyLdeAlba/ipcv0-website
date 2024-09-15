@@ -10,7 +10,7 @@ import Box from "@mui/material/Box";
 import { SnackbarProvider } from "notistack";
 import { Header } from "./Header";
 import { Backdrop } from "./Backdrop";
-import { ConnectDialog } from "./ConnectDialog";
+import { ConnectDialog, DemoModeDialog } from "./ConnectDialog";
 import { AccountDialog } from "./AccountDialog";
 import { CircularProgress } from "./CircularProgress";
 
@@ -42,6 +42,7 @@ function Layout(props) {
     <ThemeProvider theme={ muiTheme }>
     <SnackbarProvider maxSnack={ 4 }>
       <Backdrop>
+        <DemoModeDialog /> 
         <ConnectDialog /> 
         <AccountDialog />
         <CircularProgress />

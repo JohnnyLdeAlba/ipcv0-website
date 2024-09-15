@@ -164,8 +164,6 @@ function DNA(props) {
   );
 }
 
-
-
 export function Explorer(props) {
 
   const ipc_database = context.ipc_database;

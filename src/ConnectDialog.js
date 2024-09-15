@@ -32,6 +32,16 @@ function WalletConnectIcon() {
   return (<Image src="assets/walletconnect.webp" />);
 }
 
+function MetaMaskDemoIcon() {
+
+  const Image = styled('img')({
+    marginRight: "24px",
+    width: "32px"
+  });
+
+  return (<Image src="assets/metamask-demo.webp" />);
+}
+
 function CardContainer(props) {
 
   const display = typeof props.show == "undefined" ||
@@ -75,7 +85,7 @@ function MetaMaskLI() {
 
   if (walletProvider.isMobile()) {
 
-    if (!walletProvider.mm_provider.isProvider())
+    if (!walletProvider.mm_connector.isProvider())
       return (<></>);
   }
 
@@ -89,6 +99,34 @@ function MetaMaskLI() {
   return (
     <ListButton onClick={ connect }>
       <MetaMaskIcon /> <ListText>MetaMask</ListText> 
+    </ListButton>
+  );
+}
+
+function DemoConnectLI() {
+
+  const walletProvider = context.getWalletProvider(); 
+
+  if (walletProvider.isMobile()) {
+
+    if (!walletProvider.demo_connector.isProvider())
+      return (<></>);
+  }
+
+  const connect = () => {
+
+    walletProvider.connect("DemoConnect");
+    context.processSubscription("closeConnectDialog");
+    context.processSubscription("hideBackdrop");
+  }
+
+  return (
+    <ListButton onClick={ connect }>
+      <MetaMaskDemoIcon /> 
+      <ListText>
+        Demo Mode
+        <ListDesc>Requires MetaMask</ListDesc>
+      </ListText>
     </ListButton>
   );
 }
@@ -123,12 +161,6 @@ export function ConnectDialog() {
     context.hideBackdrop();
   };
 
-  const connectDC = () => {
-  
-    context.getWalletProvider().connect("DemoConnect");
-    context.hideBackdrop();
-  };
-
   return (
     <CardContainer show={ visible }>
       <Card
@@ -141,14 +173,52 @@ export function ConnectDialog() {
           <ListButton onClick={ connectWC }>
 	    <WalletConnectIcon /> <ListText>Wallet Connect</ListText>
     	  </ListButton>
-          <ListButton onClick={ connectDC }>
-	    <MetaMaskIcon />
-              <ListText>
-                Demo Mode
-                <ListDesc>Requires MetaMask</ListDesc>
-              </ListText>
-    	  </ListButton>
+	  <DemoConnectLI />
         </List>
+      </Card>
+    </CardContainer>
+  );
+}
+
+function effectFactoryDM(context, show, visible) {
+
+  return () => {
+
+    context.createSubscription("openDemoModeDialog");
+    context.createSubscription("closeDemoModeDialog");
+
+    context.addSubscriber("openDemoModeDialog", "demoModeDialog", () => { show(true); });
+    context.addSubscriber("closeDemoModeDialog", "demoModeDialog", () => { show(false); });
+
+    return () => {
+
+      context.removeSubscriber("openDemoModeDialog", "demoModeDialog");
+      context.removeSubscriber("closeModeModeDialog", "demoModeDialog");
+    };
+  }
+}
+
+export function DemoModeDialog() {
+
+  const [ visible, show ] = React.useState(false);
+  React.useEffect(effectFactoryDM(context, show, visible));
+
+  const hide = () => { show(false); };
+
+  const ListText = styled(Box)({
+    margin: "16px",
+    textAlign: "center",
+    fontWeight: "normal",
+    color: "#ffffff"
+  });
+
+  return (
+    <CardContainer show={ visible }>
+      <Card
+        icon={ <AccountBalanceWalletIcon /> }
+        title="Demo Mode"
+      >
+       <ListText>This feature does not work in Demo Mode!</ListText>
       </Card>
     </CardContainer>
   );

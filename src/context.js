@@ -138,6 +138,7 @@ export class t_context extends t_subscriptions {
     this.createSubscription("connect");
     this.createSubscription("disconnect");
     this.createSubscription("sessionUpdate");
+    this.createSubscription("openDemoModeDialog");
     this.createSubscription("openMWCDialog");
     this.createSubscription("openAccountDialog");
     this.createSubscription("sortWrapPanel");
@@ -190,6 +191,7 @@ export class t_context extends t_subscriptions {
   hideBackdrop() {
 
     this.processSubscription("hideCircular");   
+    this.processSubscription("closeDemoModeDialog");
     this.processSubscription("closeConnectDialog");
     this.processSubscription("closeAccountDialog");
     this.processSubscription("hideBackdrop");
